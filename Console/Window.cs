@@ -116,12 +116,12 @@ namespace Game
 
  					uniform mat4 coeff;
 
-					layout(location = 0) out vec3 fragColor;
+					layout(location = 0) out vec2 outUV;
 
 					void main() {
     					gl_Position = vec4(Position, 0.0, 1.0);
     					//fragColor = Color * coeff[0][0];
-
+						outUV = UV;
 					}
 					");
 				fragmentShader.Compile(@"
@@ -129,12 +129,12 @@ namespace Game
 
 					uniform sampler2D tex;
 
-					layout(location = 0) in vec3 fragColor;
+					layout(location = 0) in vec2 UV;
 
 					layout(location = 0) out vec4 outColor;
 
 					void main() {
-    					outColor = vec4(fragColor, 1.0);
+    					outColor = texture(tex, UV);
 					}
 					");
 				shaderProgram.AttachShader(vertexShader);
