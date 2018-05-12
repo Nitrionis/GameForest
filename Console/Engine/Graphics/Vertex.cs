@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using OpenTK.Graphics;
 
-namespace Console
+namespace Graphics
 {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct Vertex

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.ComponentModel;
-using Console;
-using Graphics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
-using System.Drawing;
-using System.Drawing.Imaging;
+using Console;
+using Graphics;
 
 namespace Game
 {
-	public class Window : GameWindow
+	public class Engine : GameWindow
 	{
 		private Matrix4 matrix;
 
@@ -22,7 +22,7 @@ namespace Game
 		private Bitmap bitmap = new Bitmap("D:/pdf_sit/GameForest/Console/resources/atlas.jpg");
 		int texture;
 
-		public Window() : base(
+		public Engine() : base(
 			800/*width*/, 600/*height*/,
 			GraphicsMode.Default,
 			"Ночной ДОЖОР",

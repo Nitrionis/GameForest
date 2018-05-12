@@ -5,7 +5,7 @@ namespace Console
     {
         public static void Main(string[] args)
         {
-            Game.Window window = new Game.Window();
+            Game.Engine engine = new Game.Engine();
         }
     }
 }
