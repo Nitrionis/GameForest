@@ -48,7 +48,11 @@
     <Compile Include="Engine\Graphics\VAO.cs" />
     <Compile Include="Engine\Graphics\VBO.cs" />
     <Compile Include="Engine\Graphics\Vertex.cs" />
+    <Compile Include="Engine\Scene\EndScene.cs" />
+    <Compile Include="Engine\Scene\GameObject\GameObject.cs" />
+    <Compile Include="Engine\Scene\MainScene.cs" />
     <Compile Include="Engine\Scene\Scene.cs" />
+    <Compile Include="Engine\Scene\StartUiScene.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

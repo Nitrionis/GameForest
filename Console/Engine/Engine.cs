@@ -62,6 +62,8 @@ namespace Game
 			GL.BindTexture(TextureTarget.Texture2D, texture);
 
 			meshVao.Draw();
+
+
 			// Переключаем задний и передний буферы
 			SwapBuffers();
 		}
