@@ -10,21 +10,23 @@ namespace Game
 {
 	public class Window : GameWindow
 	{
+		private Matrix4 matrix;
+
 		private VBO meshVbo;
 		private VAO meshVao;
 
 		private ShaderProgram shaderProgram;
 
 		public Window() : base(
-			800, 600,
+			800/*width*/, 600/*height*/,
 			GraphicsMode.Default,
-			"OpenGL Tutorial",
+			"Ночной ДОЖОР",
 			GameWindowFlags.Default,
 			DisplayDevice.Default,
-			4, 0,
+			4, 0, // unknow
 			GraphicsContextFlags.ForwardCompatible)
 		{
-			Run(60);
+			Run(60/*FPS*/);
 		}
 
 		// Вызывается при первоначальной загрузке
@@ -45,7 +47,11 @@ namespace Game
 		{
 			GL.Clear(ClearBufferMask.ColorBufferBit); // Очищаем буфер цвета
 			// Тут будет распологаться основной код отрисовки
+			matrix = Matrix4.Identity;
 			shaderProgram.Use();
+			int matHandle = shaderProgram.GetUniformLocation("coeff");
+			System.Console.WriteLine(matHandle);
+			GL.UniformMatrix4(matHandle, false, ref matrix);
 			meshVao.Draw();
 			// Переключаем задний и передний буферы
 			SwapBuffers();
@@ -76,19 +82,19 @@ namespace Game
 			using (var vertexShader = new Shader(ShaderType.VertexShader))
 			using (var fragmentShader = new Shader(ShaderType.FragmentShader))
 			{
-				System.Console.WriteLine("vertexShader.Compile");
 				vertexShader.Compile(@"
 					#version 400
 
 					layout(location = 0) in vec2 Position;
 					layout(location = 1) in vec3 Color;
 
+ 					uniform mat4 coeff;
+
 					out vec3 fragColor;
 
-					void main()
-					{
+					void main() {
     					gl_Position = vec4(Position, 0.0, 1.0);
-    					fragColor = Color;
+    					fragColor = Color * coeff[0][0];
 					}
 					");
 				fragmentShader.Compile(@"
@@ -98,12 +104,10 @@ namespace Game
 
 					layout(location = 0) out vec4 outColor;
 
-					void main()
-					{
+					void main() {
     					outColor = vec4(fragColor, 1.0);
 					}
 					");
-				System.Console.WriteLine("shaderProgram.AttachShader(vertexShader);");
 				shaderProgram.AttachShader(vertexShader);
 				shaderProgram.AttachShader(fragmentShader);
 				shaderProgram.Link();

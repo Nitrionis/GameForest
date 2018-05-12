@@ -51,6 +51,12 @@ namespace Graphics
 			Handle = InvalidHandle;
 		}
 
+		public int GetUniformLocation(string name)
+		{
+			// get the location of a uniform variable
+			return GL.GetUniformLocation(Handle, name);
+		}
+
 		public void Dispose()
 		{
 			ReleaseHandle();
