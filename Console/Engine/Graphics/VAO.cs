@@ -11,6 +11,8 @@ namespace Graphics
 		public int Handle { get; private set; }
 		public int VertexCount { get; private set; } // Число вершин для отрисовки
 
+		public PrimitiveType PrimitiveType = PrimitiveType.Triangles;
+
 		public VAO(int vertexCount)
 		{
 			VertexCount = vertexCount;
@@ -38,7 +40,7 @@ namespace Graphics
 		public void Draw()
 		{
 			Use();
-			GL.DrawArrays(PrimitiveType.Triangles, 0, VertexCount);
+			GL.DrawArrays(PrimitiveType, 0, VertexCount);
 		}
 
 		private void ReleaseHandle()

@@ -6,33 +6,29 @@ namespace Scene
 	{
 		protected List<GameObject> objects = new List<GameObject>();
 
-		public void Draw()
+		public void Instantiate(GameObject obj)
+		{
+			objects.Add(obj);
+		}
+		public virtual void Draw()
 		{
 			foreach (var obj in objects)
-			{
 				obj.Draw();
-			}
 		}
-		public void Update()
+		public virtual void Update()
 		{
 			foreach (var obj in objects)
-			{
 				obj.Update();
-			}
 		}
-		public void FixedUpdate()
+		public virtual void FixedUpdate()
 		{
 			foreach (var obj in objects)
-			{
 				obj.FixedApdate();
-			}
 		}
-		public void OnApplicationClosing()
+		public virtual void OnApplicationClosing()
 		{
 			foreach (var obj in objects)
-			{
 				obj.OnApplicationClosing();
-			}
 		}
 	}
 }

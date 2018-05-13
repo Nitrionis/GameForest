@@ -45,10 +45,12 @@
     <Compile Include="Engine\Engine.cs" />
     <Compile Include="Engine\Graphics\Shader.cs" />
     <Compile Include="Engine\Graphics\ShaderProgram.cs" />
+    <Compile Include="Engine\Graphics\Texture.cs" />
     <Compile Include="Engine\Graphics\VAO.cs" />
     <Compile Include="Engine\Graphics\VBO.cs" />
-    <Compile Include="Engine\Graphics\Vertex.cs" />
-    <Compile Include="Engine\Scene\EndScene.cs" />
+    <Compile Include="Engine\Scene\EndUiScene.cs" />
+    <Compile Include="Engine\Scene\GameObject\TexturedRectangle.cs" />
+    <Compile Include="Engine\Scene\GameObject\Cell.cs" />
     <Compile Include="Engine\Scene\GameObject\GameObject.cs" />
     <Compile Include="Engine\Scene\MainScene.cs" />
     <Compile Include="Engine\Scene\Scene.cs" />
