@@ -35,7 +35,7 @@ namespace Game
 			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 			GlobalRef.scene = new StartUiScene();
 
-			GlobalRef.fixedUpdateTimer = new Timer(300);
+			GlobalRef.fixedUpdateTimer = new Timer(100);
 			GlobalRef.fixedUpdateTimer.Elapsed += new ElapsedEventHandler(OnTimerTick);
 			GlobalRef.fixedUpdateTimer.Start();
 		}

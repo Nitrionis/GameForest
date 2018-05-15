@@ -42,6 +42,12 @@ namespace Scene
 			{
 				state = 0;
 			}
+
+			if (texturedRectangle.offsetV != 0.125f * state)
+			{
+				texturedRectangle.offsetV = 0.125f * state;
+				texturedRectangle.updateFlaf = true;
+			}
 		}
 	}
 }

@@ -49,6 +49,9 @@ namespace Scene
 
 	public class TexturedRectangle : GameObject
 	{
+		public bool updateFlaf = false;
+		public float offsetU = 0, offsetV = 0;
+
 		public Texture texture;
 		public VBO vbo;
 		public VAO vao;
@@ -134,12 +137,7 @@ namespace Scene
 		{
 			if (vbo == null)
 				vbo = new VBO();
-			vbo.SetData(new[] {
-				new Vertex(posSegment.startX, posSegment.startY, uvSegment.startU, uvSegment.endV),
-				new Vertex(posSegment.startX,   posSegment.endY, uvSegment.startU, uvSegment.startV),
-				new Vertex(  posSegment.endX,   posSegment.endY, uvSegment.endU,   uvSegment.startV),
-				new Vertex(  posSegment.endX, posSegment.startY, uvSegment.endU,   uvSegment.endV)
-			});
+			RecalculateData();
 			if (vao == null)
 				vao = new VAO(4);
 			vao.AttachVBO(0, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 0);
@@ -148,15 +146,32 @@ namespace Scene
 
 		}
 
+		private void RecalculateData()
+		{
+			vbo.SetData(new[] {
+				new Vertex(posSegment.startX, posSegment.startY, uvSegment.startU, uvSegment.endV + offsetV),
+				new Vertex(posSegment.startX,   posSegment.endY, uvSegment.startU, uvSegment.startV + offsetV),
+				new Vertex(  posSegment.endX,   posSegment.endY, uvSegment.endU,   uvSegment.startV + offsetV),
+				new Vertex(  posSegment.endX, posSegment.startY, uvSegment.endU,   uvSegment.endV + offsetV)
+			});
+		}
+
 		public override void Draw()
 		{
 			if (vao != null)
 			{
+				if (updateFlaf)
+				{
+					RecalculateData();
+					updateFlaf = false;
+				}
 				shaderProgram.Use();
 				if (texture != null)
 					texture.Bind();
 				vao.Draw();
 			}
 		}
+
+
 	}
 }
