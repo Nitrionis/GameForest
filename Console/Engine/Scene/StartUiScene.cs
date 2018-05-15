@@ -1,7 +1,12 @@
 ﻿
-using Game;
+using System.Drawing;
+using System.Windows.Forms;
 using Graphics;
 using OpenTK.Input;
+using System.Windows.Input;
+using Game;
+using OpenTK.Graphics.ES10;
+using static Game.GlobalRef;
 
 namespace Scene
 {
@@ -12,9 +17,9 @@ namespace Scene
 		public StartUiScene()
 		{
 			TexturedRectangle texturedRectangle = new TexturedRectangle(
-				-0.3f,  -0.1f, 0.3f, 0.1f, // Screen space
-				0.0f, 0.0f, 0.125f*3, 0.125f // UV
-			);
+				new PosSegment(-0.3f,  -0.1f, 0.3f, 0.1f),
+				new UvSegment(0.0f, 0.0f, 0.125f*3, 0.125f));
+
 			texturedRectangle.texture = new Texture("D:/pdf_sit/GameForest/Console/resources/StartUiScene/atlas.png");
 			Instantiate(texturedRectangle);
 
@@ -33,7 +38,6 @@ namespace Scene
 			MouseState mouseState = OpenTK.Input.Mouse.GetState();
 			bool leftMouseDown = mouseState.IsButtonDown(MouseButton.Left);
 			bool rightMouseDown = mouseState.IsButtonDown(MouseButton.Right);
-			System.Console.WriteLine(mouseState.X + " " + mouseState.Y);
 		}
 	}
 }

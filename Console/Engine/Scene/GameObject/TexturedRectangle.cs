@@ -6,39 +6,30 @@ using DrawBufferMode = OpenTK.Graphics.ES11.DrawBufferMode;
 
 namespace Scene
 {
-	public class TexturedRectangle : GameObject
+	public struct UvSegment
 	{
-		//public
-		public VBO vbo { get; private set; }
-		public VAO vao { get; private set; }
-		private ShaderProgram shaderProgram = new ShaderProgram();
-		public Texture texture;
+		public float startU;
+		public float startV;
+		public float endU;
+		public float endV;
 
-		[StructLayout(LayoutKind.Sequential)]
-		struct Vertex
+		public UvSegment(float startU, float startV, float endU, float endV)
 		{
-			public float X, Y;
-			public float U, V;
-
-			public Vertex(float x, float y, float u, float v)
-			{
-				X = x; Y = y;
-				U = u; V = v;
-			}
+			this.startU = startU;
+			this.startV = startV;
+			this.endU = endU;
+			this.endV = endV;
 		}
+	}
 
-		public float startX { get; private set; }
-		public float startY { get; private set; }
-		public float endX { get; private set; }
-		public float endY { get; private set; }
+	public struct PosSegment
+	{
+		public float startX;
+		public float startY;
+		public float endX;
+		public float endY;
 
-		public float startU { get; private set; }
-		public float startV { get; private set; }
-		public float endU { get; private set; }
-		public float endV { get; private set; }
-
-		public TexturedRectangle(float startX, float startY, float endX, float endY,
-			float startU, float startV, float endU, float endV) : base()
+		public PosSegment(float startX, float startY, float endX, float endY)
 		{
 			if (startX < -1) startX = -1;
 			if (startX > 1) startX = 1;
@@ -53,11 +44,49 @@ namespace Scene
 			this.startY = startY;
 			this.endX = endX;
 			this.endY = endY;
-			this.startU = startU;
-			this.startV = startV;
-			this.endU = endU;
-			this.endV = endV;
+		}
+	}
 
+	public class TexturedRectangle : GameObject
+	{
+		public Texture texture;
+		public VBO vbo;
+		public VAO vao;
+		public ShaderProgram shaderProgram = new ShaderProgram();
+
+		[StructLayout(LayoutKind.Sequential)]
+		struct Vertex
+		{
+			public float X, Y;
+			public float U, V;
+
+			public Vertex(float x, float y, float u, float v)
+			{
+				X = x; Y = y;
+				U = u; V = v;
+			}
+		}
+
+		public UvSegment uvSegment { get; private set; }
+		public PosSegment posSegment { get; private set; }
+
+		public TexturedRectangle(VBO vbo, PosSegment posSegment, UvSegment uvSegment)
+		{
+			this.vbo = vbo;
+			this.posSegment = posSegment;
+			this.uvSegment = uvSegment;
+			Initialize();
+		}
+
+		public TexturedRectangle(PosSegment posSegment, UvSegment uvSegment)
+		{
+			this.posSegment = posSegment;
+			this.uvSegment = uvSegment;
+			Initialize();
+		}
+
+		private void Initialize()
+		{
 			CreateSaders();
 			CreateMesh();
 		}
@@ -106,24 +135,28 @@ namespace Scene
 			if (vbo == null)
 				vbo = new VBO();
 			vbo.SetData(new[] {
-				new Vertex(startX, startY, startU, endV),
-				new Vertex(startX,   endY, startU, startV),
-				new Vertex(  endX,   endY, endU,   startV),
-				new Vertex(  endX, startY, endU,   endV)
+				new Vertex(posSegment.startX, posSegment.startY, uvSegment.startU, uvSegment.endV),
+				new Vertex(posSegment.startX,   posSegment.endY, uvSegment.startU, uvSegment.startV),
+				new Vertex(  posSegment.endX,   posSegment.endY, uvSegment.endU,   uvSegment.startV),
+				new Vertex(  posSegment.endX, posSegment.startY, uvSegment.endU,   uvSegment.endV)
 			});
 			if (vao == null)
 				vao = new VAO(4);
 			vao.AttachVBO(0, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 0);
 			vao.AttachVBO(1, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 2 * sizeof(float));
 			vao.PrimitiveType = PrimitiveType.TriangleFan;
+
 		}
 
 		public override void Draw()
 		{
-			shaderProgram.Use();
-			if (texture != null)
-				texture.Bind();
-			vao.Draw();
+			if (vao != null)
+			{
+				shaderProgram.Use();
+				if (texture != null)
+					texture.Bind();
+				vao.Draw();
+			}
 		}
 	}
 }

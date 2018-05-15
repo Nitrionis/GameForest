@@ -2,19 +2,19 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Timers;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using Console;
 using Graphics;
+using OpenTK.Input;
 using Scene;
 
 namespace Game
 {
 	public class Window : GameWindow
 	{
-		private Scene.Scene scene;
-
 		public Window() : base(
 			800/*width*/, 600/*height*/,
 			GraphicsMode.Default,
@@ -33,8 +33,16 @@ namespace Game
 			GL.ClearColor(new Color4(34, 34, 34, 255));
 			GL.Enable(EnableCap.Blend);
 			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-			scene = new StartUiScene();
+			GlobalRef.scene = new StartUiScene();
 
+			GlobalRef.fixedUpdateTimer = new Timer(300);
+			GlobalRef.fixedUpdateTimer.Elapsed += new ElapsedEventHandler(OnTimerTick);
+			GlobalRef.fixedUpdateTimer.Start();
+		}
+
+		private void OnTimerTick(object source, ElapsedEventArgs e)
+		{
+			GlobalRef.scene.FixedUpdate();
 		}
 
 		protected override void OnResize(EventArgs e)
@@ -46,15 +54,23 @@ namespace Game
 		{
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 
-			scene.Update();
-			scene.Draw();
+			GlobalRef.scene.Update();
+			GlobalRef.scene.Draw();
 
 			SwapBuffers();
 		}
 
+		protected override void OnMouseMove(MouseMoveEventArgs e)
+		{
+			base.OnMouseMove(e);
+			GlobalRef.cursorPos.X = e.X;
+			GlobalRef.cursorPos.Y = e.Y;
+		}
+
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			scene.OnApplicationClosing();
+			GlobalRef.fixedUpdateTimer.Stop();
+			GlobalRef.scene.OnApplicationClosing();
 		}
 	}
 }
