@@ -2,6 +2,8 @@
 {
 	public class GameObject
 	{
+		public bool active = true;
+
 		public GameObject()
 		{
 			Start();

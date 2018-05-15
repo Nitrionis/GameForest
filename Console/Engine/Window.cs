@@ -11,11 +11,11 @@ using Scene;
 
 namespace Game
 {
-	public class Engine : GameWindow
+	public class Window : GameWindow
 	{
 		private Scene.Scene scene;
 
-		public Engine() : base(
+		public Window() : base(
 			800/*width*/, 600/*height*/,
 			GraphicsMode.Default,
 			"Ночной ДОЖОР",
@@ -24,15 +24,17 @@ namespace Game
 			4, 0, // unknow
 			GraphicsContextFlags.ForwardCompatible)
 		{
+			GlobalRef.window = this;
 			Run(60/*FPS*/);
 		}
 
 		protected override void OnLoad(EventArgs e)
 		{
-			GL.ClearColor(Color.DimGray);
+			GL.ClearColor(new Color4(34, 34, 34, 255));
 			GL.Enable(EnableCap.Blend);
 			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 			scene = new StartUiScene();
+
 		}
 
 		protected override void OnResize(EventArgs e)

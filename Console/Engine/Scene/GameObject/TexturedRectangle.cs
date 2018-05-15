@@ -12,7 +12,7 @@ namespace Scene
 		public VBO vbo { get; private set; }
 		public VAO vao { get; private set; }
 		private ShaderProgram shaderProgram = new ShaderProgram();
-		private Texture texture = new Texture("D:/pdf_sit/GameForest/Console/resources/MainScene/atlas.png");
+		public Texture texture;
 
 		[StructLayout(LayoutKind.Sequential)]
 		struct Vertex
@@ -31,6 +31,7 @@ namespace Scene
 		public float startY { get; private set; }
 		public float endX { get; private set; }
 		public float endY { get; private set; }
+
 		public float startU { get; private set; }
 		public float startV { get; private set; }
 		public float endU { get; private set; }
@@ -102,14 +103,16 @@ namespace Scene
 
 		private void CreateMesh()
 		{
-			vbo = new VBO();
+			if (vbo == null)
+				vbo = new VBO();
 			vbo.SetData(new[] {
-				new Vertex(startX, startY, startU, startV),
-				new Vertex(startX,   endY, startU, endV),
-				new Vertex(  endX,   endY, endU,   endV),
-				new Vertex(  endX, startY, endU,   startV)
+				new Vertex(startX, startY, startU, endV),
+				new Vertex(startX,   endY, startU, startV),
+				new Vertex(  endX,   endY, endU,   startV),
+				new Vertex(  endX, startY, endU,   endV)
 			});
-			vao = new VAO(4);
+			if (vao == null)
+				vao = new VAO(4);
 			vao.AttachVBO(0, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 0);
 			vao.AttachVBO(1, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 2 * sizeof(float));
 			vao.PrimitiveType = PrimitiveType.TriangleFan;
@@ -118,7 +121,8 @@ namespace Scene
 		public override void Draw()
 		{
 			shaderProgram.Use();
-			texture.Bind();
+			if (texture != null)
+				texture.Bind();
 			vao.Draw();
 		}
 	}
