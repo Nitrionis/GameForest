@@ -45,9 +45,9 @@ namespace Scene
 
 			TexturedRectangle texturedRectangleTwo = new TexturedRectangle(
 				new PosSegment(-0.3f,  -1.0f, 0.3f, -0.8f),
-				new UvSegment(0.0f, 0.125f, 0.125f*3, 0.125f*2));
+				new UvSegment(0.0f, 0.0f, 0.125f*3, 0.125f));
 
-			texturedRectangleTwo.texture = new Texture("D:/pdf_sit/GameForest/Console/resources/StartUiScene/atlas.png");
+			texturedRectangleTwo.texture = texturedRectangle.texture;
 			Instantiate(texturedRectangleTwo);
 
 			buttonTwo = new Button(texturedRectangleTwo);

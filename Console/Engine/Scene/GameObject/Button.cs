@@ -33,7 +33,7 @@ namespace Scene
 			int newState;
 			PosSegment location = texturedRectangle.posSegment;
 			double x = cursorPos.X / (double)window.Width * 2 - 1;
-			double y = cursorPos.Y / (double)window.Height * 2 - 1;
+			double y = (window.Height - cursorPos.Y) / (double)window.Height * 2 - 1;
 			if (location.startX <= x
 			    && location.endX >= x
 			    && location.startY <= y

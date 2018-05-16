@@ -31,9 +31,9 @@ namespace Game
 			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 			GlobalReference.scene = new StartUiScene();
 
-			GlobalReference.fixedUpdateTimer = new Timer(100);
+			/*GlobalReference.fixedUpdateTimer = new Timer(100);
 			GlobalReference.fixedUpdateTimer.Elapsed += new ElapsedEventHandler(OnTimerTick);
-			GlobalReference.fixedUpdateTimer.Start();
+			GlobalReference.fixedUpdateTimer.Start();*/
 		}
 
 		protected override void OnResize(EventArgs e)
@@ -50,6 +50,7 @@ namespace Game
 		{
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 
+			GlobalReference.scene.FixedUpdate();
 			GlobalReference.scene.Update();
 			GlobalReference.scene.Draw();
 
@@ -65,7 +66,7 @@ namespace Game
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			GlobalReference.fixedUpdateTimer.Stop();
+			//GlobalReference.fixedUpdateTimer.Stop();
 			GlobalReference.scene.OnApplicationClosing();
 		}
 	}
