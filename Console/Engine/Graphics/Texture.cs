@@ -42,6 +42,13 @@ namespace Graphics
 			GL.BindTexture(TextureTarget.Texture2D, Handle);
 		}
 
+		public void Dispose()
+		{
+			ReleaseHandle();
+			bitmap.Dispose();
+			GC.SuppressFinalize(this);
+		}
+
 		private void ReleaseHandle()
 		{
 			if (Handle == InvalidHandle)
@@ -50,13 +57,6 @@ namespace Graphics
 			GL.DeleteTexture(Handle);
 
 			Handle = InvalidHandle;
-		}
-
-		public void Dispose()
-		{
-			ReleaseHandle();
-			bitmap.Dispose();
-			GC.SuppressFinalize(this);
 		}
 
 		~Texture()

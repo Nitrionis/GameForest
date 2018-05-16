@@ -1,6 +1,6 @@
 ﻿namespace Scene
 {
-	public class EndScene
+	public class EndUiScene : Scene
 	{
 		
 	}

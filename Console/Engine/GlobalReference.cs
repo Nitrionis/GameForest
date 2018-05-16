@@ -3,7 +3,7 @@ using System.Timers;
 
 namespace Game
 {
-	public class GlobalRef
+	public class GlobalReference
 	{
 		public static Window window;
 		public static Scene.Scene scene;

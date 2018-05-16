@@ -1,13 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Timers;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
-using Console;
-using Graphics;
 using OpenTK.Input;
 using Scene;
 
@@ -24,7 +20,7 @@ namespace Game
 			4, 0, // unknow
 			GraphicsContextFlags.ForwardCompatible)
 		{
-			GlobalRef.window = this;
+			GlobalReference.window = this;
 			Run(60/*FPS*/);
 		}
 
@@ -33,16 +29,11 @@ namespace Game
 			GL.ClearColor(new Color4(34, 34, 34, 255));
 			GL.Enable(EnableCap.Blend);
 			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-			GlobalRef.scene = new StartUiScene();
+			GlobalReference.scene = new StartUiScene();
 
-			GlobalRef.fixedUpdateTimer = new Timer(100);
-			GlobalRef.fixedUpdateTimer.Elapsed += new ElapsedEventHandler(OnTimerTick);
-			GlobalRef.fixedUpdateTimer.Start();
-		}
-
-		private void OnTimerTick(object source, ElapsedEventArgs e)
-		{
-			GlobalRef.scene.FixedUpdate();
+			GlobalReference.fixedUpdateTimer = new Timer(100);
+			GlobalReference.fixedUpdateTimer.Elapsed += new ElapsedEventHandler(OnTimerTick);
+			GlobalReference.fixedUpdateTimer.Start();
 		}
 
 		protected override void OnResize(EventArgs e)
@@ -50,12 +41,17 @@ namespace Game
 			GL.Viewport(0, 0, Width, Height);
 		}
 
+		protected void OnTimerTick(object source, ElapsedEventArgs e)
+		{
+			GlobalReference.scene.FixedUpdate();
+		}
+
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 
-			GlobalRef.scene.Update();
-			GlobalRef.scene.Draw();
+			GlobalReference.scene.Update();
+			GlobalReference.scene.Draw();
 
 			SwapBuffers();
 		}
@@ -63,14 +59,14 @@ namespace Game
 		protected override void OnMouseMove(MouseMoveEventArgs e)
 		{
 			base.OnMouseMove(e);
-			GlobalRef.cursorPos.X = e.X;
-			GlobalRef.cursorPos.Y = e.Y;
+			GlobalReference.cursorPos.X = e.X;
+			GlobalReference.cursorPos.Y = e.Y;
 		}
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			GlobalRef.fixedUpdateTimer.Stop();
-			GlobalRef.scene.OnApplicationClosing();
+			GlobalReference.fixedUpdateTimer.Stop();
+			GlobalReference.scene.OnApplicationClosing();
 		}
 	}
 }

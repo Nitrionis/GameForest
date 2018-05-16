@@ -1,18 +1,32 @@
 ﻿
-using System.Drawing;
-using System.Windows.Forms;
+using Game;
 using Graphics;
 using OpenTK.Input;
-using System.Windows.Input;
-using Game;
-using OpenTK.Graphics.ES10;
-using static Game.GlobalRef;
 
 namespace Scene
 {
 	public class StartUiScene : Scene
 	{
-		private Button button;
+		private Button buttonOne;
+		private Button buttonTwo;
+
+		class ButtonCheker : IButtonAction
+		{
+			private TexturedRectangle texturedRectangle;
+
+			public ButtonCheker(TexturedRectangle texturedRectangle)
+			{
+				this.texturedRectangle = texturedRectangle;
+			}
+
+			public void Event(int state)
+			{
+				texturedRectangle.offsetV = 0.125f * state;
+				texturedRectangle.updateFlaf = true;
+				if (state == 2)
+					GlobalReference.scene = new MainScene();
+			}
+		}
 
 		public StartUiScene()
 		{
@@ -23,8 +37,23 @@ namespace Scene
 			texturedRectangle.texture = new Texture("D:/pdf_sit/GameForest/Console/resources/StartUiScene/atlas.png");
 			Instantiate(texturedRectangle);
 
-			button = new Button(texturedRectangle);
-			Instantiate(button);
+			buttonOne = new Button(texturedRectangle);
+			ButtonCheker buttonCheker = new ButtonCheker(texturedRectangle);
+			buttonOne.listeners.Add(buttonCheker);
+			Instantiate(buttonOne);
+
+
+			TexturedRectangle texturedRectangleTwo = new TexturedRectangle(
+				new PosSegment(-0.3f,  -1.0f, 0.3f, -0.8f),
+				new UvSegment(0.0f, 0.125f, 0.125f*3, 0.125f*2));
+
+			texturedRectangleTwo.texture = new Texture("D:/pdf_sit/GameForest/Console/resources/StartUiScene/atlas.png");
+			Instantiate(texturedRectangleTwo);
+
+			buttonTwo = new Button(texturedRectangleTwo);
+			ButtonCheker buttonChekerTwo = new ButtonCheker(texturedRectangleTwo);
+			buttonTwo.listeners.Add(buttonChekerTwo);
+			Instantiate(buttonTwo);
 		}
 
 		public override void Update()

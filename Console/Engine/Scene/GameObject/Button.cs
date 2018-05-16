@@ -1,11 +1,19 @@
-﻿using OpenTK.Input;
-using static Game.GlobalRef;
+﻿using System.Collections.Generic;
+using OpenTK.Input;
+using static Game.GlobalReference;
 
 namespace Scene
 {
+	public interface IButtonAction
+	{
+		void Event(int state);
+	}
+
 	public class Button : GameObject
 	{
-		public int state = 0;
+		public volatile int state;
+
+		public List<IButtonAction> listeners { get; private set; } = new List<IButtonAction>();
 
 		private TexturedRectangle texturedRectangle;
 
@@ -17,11 +25,12 @@ namespace Scene
 		public override void FixedApdate()
 		{
 			if (active)
-				CheckPressed();
+				CheckEvents();
 		}
 
-		private void CheckPressed()
+		private void CheckEvents()
 		{
+			int newState;
 			PosSegment location = texturedRectangle.posSegment;
 			double x = cursorPos.X / (double)window.Width * 2 - 1;
 			double y = cursorPos.Y / (double)window.Height * 2 - 1;
@@ -30,23 +39,26 @@ namespace Scene
 			    && location.startY <= y
 			    && location.endY >= y)
 			{
-				state = 1;
+				newState = 1;
 				MouseState mouseState = OpenTK.Input.Mouse.GetState();
 				bool leftMouseDown = mouseState.IsButtonDown(MouseButton.Left);
 				if (leftMouseDown)
 				{
-					state = 2;
+					newState = 2;
 				}
 			}
 			else
 			{
-				state = 0;
+				newState = 0;
 			}
 
-			if (texturedRectangle.offsetV != 0.125f * state)
+			if (newState != state)
 			{
-				texturedRectangle.offsetV = 0.125f * state;
-				texturedRectangle.updateFlaf = true;
+				state = newState;
+				foreach (var listener in listeners)
+				{
+					listener.Event(state);
+				}
 			}
 		}
 	}

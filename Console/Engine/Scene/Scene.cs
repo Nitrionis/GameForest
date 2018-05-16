@@ -2,7 +2,7 @@
 
 namespace Scene
 {
-	public class Scene
+	public abstract class Scene
 	{
 		protected List<GameObject> objects = new List<GameObject>();
 

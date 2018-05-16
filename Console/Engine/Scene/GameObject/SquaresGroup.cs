@@ -37,7 +37,7 @@ namespace Scene
 				vertexShader.Compile(@"
 					#version 400
 
-					uniform mat4 coeff;
+					uniform vec2 uv_offsets[64];
 
 					layout(location = 0) in vec2 in_Position;
 					layout(location = 1) in vec2 in_UV;

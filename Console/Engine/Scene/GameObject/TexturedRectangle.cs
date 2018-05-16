@@ -35,9 +35,9 @@ namespace Scene
 			if (startX > 1) startX = 1;
 			if (startY < -1) startY = -1;
 			if (startY > 1) startY = 1;
-			if (endX < 0) endX = 0;
+			if (endX < -1) endX = -1;
 			if (endX > 1) endX = 1;
-			if (endY < 0) endY = 0;
+			if (endY < -1) endY = -1;
 			if (endY > 1) endY = 1;
 
 			this.startX = startX;
@@ -137,7 +137,7 @@ namespace Scene
 		{
 			if (vbo == null)
 				vbo = new VBO();
-			RecalculateData();
+			RecalculateMesh();
 			if (vao == null)
 				vao = new VAO(4);
 			vao.AttachVBO(0, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 0);
@@ -146,13 +146,13 @@ namespace Scene
 
 		}
 
-		private void RecalculateData()
+		private void RecalculateMesh()
 		{
 			vbo.SetData(new[] {
-				new Vertex(posSegment.startX, posSegment.startY, uvSegment.startU, uvSegment.endV + offsetV),
-				new Vertex(posSegment.startX,   posSegment.endY, uvSegment.startU, uvSegment.startV + offsetV),
-				new Vertex(  posSegment.endX,   posSegment.endY, uvSegment.endU,   uvSegment.startV + offsetV),
-				new Vertex(  posSegment.endX, posSegment.startY, uvSegment.endU,   uvSegment.endV + offsetV)
+				new Vertex(posSegment.startX, posSegment.startY, uvSegment.startU + offsetU, uvSegment.endV + offsetV),
+				new Vertex(posSegment.startX,   posSegment.endY, uvSegment.startU + offsetU, uvSegment.startV + offsetV),
+				new Vertex(  posSegment.endX,   posSegment.endY, uvSegment.endU + offsetU,   uvSegment.startV + offsetV),
+				new Vertex(  posSegment.endX, posSegment.startY, uvSegment.endU + offsetU,   uvSegment.endV + offsetV)
 			});
 		}
 
@@ -162,7 +162,7 @@ namespace Scene
 			{
 				if (updateFlaf)
 				{
-					RecalculateData();
+					RecalculateMesh();
 					updateFlaf = false;
 				}
 				shaderProgram.Use();
