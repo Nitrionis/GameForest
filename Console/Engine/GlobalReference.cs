@@ -6,7 +6,7 @@ namespace Game
 	public class GlobalReference
 	{
 		public static Window window;
-		public static Scene.Scene scene;
+		public static Scene scene;
 		public static Timer fixedUpdateTimer;
 		public static Point cursorPos;
 	}

@@ -40,7 +40,7 @@ namespace Scene
 			    && location.endY >= y)
 			{
 				newState = 1;
-				MouseState mouseState = OpenTK.Input.Mouse.GetState();
+				MouseState mouseState = Mouse.GetState();
 				bool leftMouseDown = mouseState.IsButtonDown(MouseButton.Left);
 				if (leftMouseDown)
 				{

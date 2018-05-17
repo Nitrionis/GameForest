@@ -1,16 +1,20 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Timers;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
-using Scene;
+using static Game.GlobalReference;
+using Console = System.Console;
 
 namespace Game
 {
 	public class Window : GameWindow
 	{
+		public volatile bool sceneChanging = false;
+
 		public Window() : base(
 			800/*width*/, 600/*height*/,
 			GraphicsMode.Default,
@@ -20,8 +24,8 @@ namespace Game
 			4, 0, // unknow
 			GraphicsContextFlags.ForwardCompatible)
 		{
-			GlobalReference.window = this;
-			Run(60/*FPS*/);
+			window = this;
+			Run(60 /*FPS*/);
 		}
 
 		protected override void OnLoad(EventArgs e)
@@ -29,11 +33,11 @@ namespace Game
 			GL.ClearColor(new Color4(34, 34, 34, 255));
 			GL.Enable(EnableCap.Blend);
 			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-			GlobalReference.scene = new StartUiScene();
+			scene = new StartUiScene();
 
-			/*GlobalReference.fixedUpdateTimer = new Timer(100);
-			GlobalReference.fixedUpdateTimer.Elapsed += new ElapsedEventHandler(OnTimerTick);
-			GlobalReference.fixedUpdateTimer.Start();*/
+			/*fixedUpdateTimer = new Timer(100);
+			fixedUpdateTimer.Elapsed += new ElapsedEventHandler(OnTimerTick);
+			fixedUpdateTimer.Start();*/
 		}
 
 		protected override void OnResize(EventArgs e)
@@ -43,31 +47,54 @@ namespace Game
 
 		protected void OnTimerTick(object source, ElapsedEventArgs e)
 		{
-			GlobalReference.scene.FixedUpdate();
+			if (!sceneChanging)
+				scene.FixedUpdate();
 		}
 
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
-			GL.Clear(ClearBufferMask.ColorBufferBit);
+			if (!sceneChanging)
+			{
+				GL.Clear(ClearBufferMask.ColorBufferBit);
 
-			GlobalReference.scene.FixedUpdate();
-			GlobalReference.scene.Update();
-			GlobalReference.scene.Draw();
+				scene.FixedUpdate();
+				scene.Update();
+				scene.Draw();
 
-			SwapBuffers();
+				SwapBuffers();
+			}
+		}
+
+		private System.Object lockThis = new System.Object();
+
+		public bool ChangeScene<T>() where T : Scene, new ()
+		{
+			lock (lockThis)
+			{
+				if (!sceneChanging && !(scene is T))
+				{
+					sceneChanging = true;
+					System.Console.WriteLine("New Scene Created");
+					scene = new T();
+					sceneChanging = false;
+					return true;
+				}
+			}
+			return false;
 		}
 
 		protected override void OnMouseMove(MouseMoveEventArgs e)
 		{
 			base.OnMouseMove(e);
-			GlobalReference.cursorPos.X = e.X;
-			GlobalReference.cursorPos.Y = e.Y;
+			cursorPos.X = e.X;
+			cursorPos.Y = e.Y;
 		}
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			//GlobalReference.fixedUpdateTimer.Stop();
-			GlobalReference.scene.OnApplicationClosing();
+			if (fixedUpdateTimer != null)
+				fixedUpdateTimer.Stop();
+			scene.OnApplicationClosing();
 		}
 	}
 }

@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine\Scene\GameObject\Button.cs" />
+    <Compile Include="Engine\Scene\GameObject\TextObject.cs" />
     <Compile Include="Engine\Synchronization.cs" />
     <Compile Include="Engine\Window.cs" />
     <Compile Include="Engine\GlobalReference.cs" />

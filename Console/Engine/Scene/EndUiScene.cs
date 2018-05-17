@@ -1,4 +1,4 @@
-﻿namespace Scene
+﻿namespace Game
 {
 	public class EndUiScene : Scene
 	{

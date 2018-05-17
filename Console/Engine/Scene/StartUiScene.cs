@@ -1,9 +1,10 @@
-﻿
-using Game;
+﻿using Game;
+using Scene;
 using Graphics;
 using OpenTK.Input;
+using static Game.GlobalReference;
 
-namespace Scene
+namespace Game
 {
 	public class StartUiScene : Scene
 	{
@@ -23,8 +24,8 @@ namespace Scene
 			{
 				texturedRectangle.offsetV = 0.125f * state;
 				texturedRectangle.updateFlaf = true;
-				if (state == 2)
-					GlobalReference.scene = new MainScene();
+				if (state == 2 && !window.sceneChanging)
+					window.ChangeScene<MainScene>();
 			}
 		}
 
@@ -64,7 +65,7 @@ namespace Scene
 
 		private void CheckEvents()
 		{
-			MouseState mouseState = OpenTK.Input.Mouse.GetState();
+			MouseState mouseState = Mouse.GetState();
 			bool leftMouseDown = mouseState.IsButtonDown(MouseButton.Left);
 			bool rightMouseDown = mouseState.IsButtonDown(MouseButton.Right);
 		}

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Scene;
 
-namespace Scene
+namespace Game
 {
 	public abstract class Scene
 	{
