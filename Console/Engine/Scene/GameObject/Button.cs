@@ -15,9 +15,9 @@ namespace Scene
 
 		public List<IButtonAction> listeners { get; private set; } = new List<IButtonAction>();
 
-		private TexturedRectangle texturedRectangle;
+		private IRectangleGetter texturedRectangle;
 
-		public Button(TexturedRectangle texturedRectangle)
+		public Button(IRectangleGetter texturedRectangle)
 		{
 			this.texturedRectangle = texturedRectangle;
 		}
@@ -31,9 +31,11 @@ namespace Scene
 		private void CheckEvents()
 		{
 			int newState;
-			PosSegment location = texturedRectangle.posSegment;
+			PosSegment location = texturedRectangle.GetPosSegment();
+
 			double x = cursorPos.X / (double)window.Width * 2 - 1;
 			double y = (window.Height - cursorPos.Y) / (double)window.Height * 2 - 1;
+
 			if (location.startX <= x
 			    && location.endX >= x
 			    && location.startY <= y

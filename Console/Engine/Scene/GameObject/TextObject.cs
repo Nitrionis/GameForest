@@ -13,6 +13,7 @@ namespace Scene
 		public string text { get; private set; }
 
 		public Texture texture;
+		public VBO ibo;
 		public VBO vbo;
 		public VAO vao;
 		public ShaderProgram shaderProgram = new ShaderProgram();
@@ -85,16 +86,22 @@ namespace Scene
 
 		private void CreateMesh()
 		{
+			if (vao == null)
+				vao = new VAO(6 * text.Length);
+			if (ibo == null)
+				ibo = new VBO(BufferTarget.ElementArrayBuffer);
 			if (vbo == null)
 				vbo = new VBO();
-			SetText(text);
-			if (vao == null)
-				vao = new VAO(4 * text.Length);
-
+			Vertex[] data = new Vertex[6 * 10];
+			for (int i = 0; i < data.Length; i++)
+			{
+				data[i] = new Vertex(0,0,0,0);
+			}
+			vbo.SetData(data);
 			vao.AttachVBO(0, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 0);
 			vao.AttachVBO(1, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 2 * sizeof(float));
-			vao.PrimitiveType = PrimitiveType.Quads;
-
+			vao.PrimitiveType = PrimitiveType.Triangles;
+			SetText(text);
 		}
 
 		public override void Draw()
@@ -115,10 +122,10 @@ namespace Scene
 
 		public void SetText(string str)
 		{
-			Vertex[] data = new Vertex[4 * str.Length];
+			Vertex[] data = new Vertex[6 * str.Length];
 			int firstCharId = Convert.ToInt32('0');
 			float offsetX = 0;
-			for (int end = 4 * str.Length, charIndex = 0, i = 0; i < end; i += 4, offsetX += 0.1f, charIndex++)
+			for (int end = 6 * str.Length, charIndex = 0, i = 0; i < end; i += 6, offsetX += 0.1f, charIndex++)
 			{
 				int charId = Convert.ToInt32(str[charIndex]) - firstCharId;
 
@@ -131,11 +138,19 @@ namespace Scene
 				data[i+2] = new Vertex(
 					posSegment.endX + offsetX, posSegment.endY,
 					0.044921875f *(charId+1), 0.625f);
-				data[i+3] = new Vertex(
+
+				data[i+3]   = new Vertex(
+					posSegment.startX + offsetX, posSegment.startY,
+					0.044921875f * charId, 	0.625f + 0.0625f);
+				data[i+4] = new Vertex(
+					posSegment.endX + offsetX, posSegment.endY,
+					0.044921875f *(charId+1), 0.625f);
+				data[i+5] = new Vertex(
 					posSegment.endX + offsetX, posSegment.startY,
 					0.044921875f *(charId+1), 0.625f + 0.0625f);
 			}
-			vbo.SetData(data);
+			vbo.SetSubData(data, data.Length);
+			vao.VertexCount = 6 * str.Length;
 		}
 	}
 }

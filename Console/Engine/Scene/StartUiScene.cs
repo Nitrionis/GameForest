@@ -8,7 +8,7 @@ namespace Game
 {
 	public class StartUiScene : Scene
 	{
-		private Button buttonOne;
+		private Button button;
 		private Button buttonTwo;
 
 		class ButtonCheker : IButtonAction
@@ -38,23 +38,10 @@ namespace Game
 			texturedRectangle.texture = new Texture("D:/pdf_sit/GameForest/Console/resources/StartUiScene/atlas.png");
 			Instantiate(texturedRectangle);
 
-			buttonOne = new Button(texturedRectangle);
+			button = new Button(texturedRectangle);
 			ButtonCheker buttonCheker = new ButtonCheker(texturedRectangle);
-			buttonOne.listeners.Add(buttonCheker);
-			Instantiate(buttonOne);
-
-
-			TexturedRectangle texturedRectangleTwo = new TexturedRectangle(
-				new PosSegment(-0.3f,  -1.0f, 0.3f, -0.8f),
-				new UvSegment(0.0f, 0.0f, 0.125f*3, 0.125f));
-
-			texturedRectangleTwo.texture = texturedRectangle.texture;
-			Instantiate(texturedRectangleTwo);
-
-			buttonTwo = new Button(texturedRectangleTwo);
-			ButtonCheker buttonChekerTwo = new ButtonCheker(texturedRectangleTwo);
-			buttonTwo.listeners.Add(buttonChekerTwo);
-			Instantiate(buttonTwo);
+			button.listeners.Add(buttonCheker);
+			Instantiate(button);
 		}
 
 		public override void Update()

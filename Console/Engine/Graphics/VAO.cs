@@ -9,7 +9,7 @@ namespace Graphics
 		private const int InvalidHandle = -1;
 
 		public int Handle { get; private set; }
-		public int VertexCount { get; private set; } // Число вершин для отрисовки
+		public int VertexCount { get; set; } // Число вершин для отрисовки
 
 		public PrimitiveType PrimitiveType = PrimitiveType.Triangles;
 

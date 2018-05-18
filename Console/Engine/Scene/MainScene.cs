@@ -1,15 +1,17 @@
 ﻿using System;
-using Game;
 using Graphics;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
 using Scene;
+using Button = Scene.Button;
 
 namespace Game
 {
 	public class MainScene : Scene
 	{
+		private DateTime endTime = DateTime.Now.AddMinutes(1);
+
 		private Button[] buttons = new Button[64];
 		private TexturedRectangle[] texturedRectangles = new TexturedRectangle[64];
 
@@ -67,11 +69,16 @@ namespace Game
 			GL.ClearColor(new Color4(34, 34, 34, 255));
 		}
 
+		private int seconds = 0;
+
 		public override void Update()
 		{
 			base.Update();
-			CheckEvents();
-			textObject.SetText("9876543210");
+			if (endTime > DateTime.Now)
+			{
+				CheckEvents();
+				textObject.SetText((endTime - DateTime.Now).Seconds.ToString());
+			}
 		}
 
 		private void CheckEvents()

@@ -6,7 +6,7 @@ using DrawBufferMode = OpenTK.Graphics.ES11.DrawBufferMode;
 
 namespace Scene
 {
-	public struct UvSegment
+	public class UvSegment
 	{
 		public float startU;
 		public float startV;
@@ -22,7 +22,7 @@ namespace Scene
 		}
 	}
 
-	public struct PosSegment
+	public class PosSegment
 	{
 		public float startX;
 		public float startY;
@@ -47,7 +47,12 @@ namespace Scene
 		}
 	}
 
-	public class TexturedRectangle : GameObject
+	public interface IRectangleGetter
+	{
+		PosSegment GetPosSegment();
+	}
+
+	public class TexturedRectangle : GameObject, IRectangleGetter
 	{
 		public bool updateFlaf = false;
 		public float offsetU = 0, offsetV = 0;
@@ -58,7 +63,7 @@ namespace Scene
 		public ShaderProgram shaderProgram = new ShaderProgram();
 
 		[StructLayout(LayoutKind.Sequential)]
-		struct Vertex
+		public struct Vertex
 		{
 			public float X, Y;
 			public float U, V;
@@ -70,28 +75,36 @@ namespace Scene
 			}
 		}
 
-		public UvSegment uvSegment { get; private set; }
-		public PosSegment posSegment { get; private set; }
+		public UvSegment uv { get; private set; }
+		public PosSegment pos { get; private set; }
 
-		public TexturedRectangle(VBO vbo, PosSegment posSegment, UvSegment uvSegment)
+		public PosSegment GetPosSegment()
+		{
+			return pos;
+		}
+
+		public TexturedRectangle(VBO vbo, PosSegment pos, UvSegment uv)
 		{
 			this.vbo = vbo;
-			this.posSegment = posSegment;
-			this.uvSegment = uvSegment;
+			this.pos = pos;
+			this.uv = uv;
 			Initialize();
 		}
 
-		public TexturedRectangle(PosSegment posSegment, UvSegment uvSegment)
+		public TexturedRectangle(PosSegment pos, UvSegment uv)
 		{
-			this.posSegment = posSegment;
-			this.uvSegment = uvSegment;
+			this.pos = pos;
+			this.uv = uv;
 			Initialize();
 		}
 
 		private void Initialize()
 		{
-			CreateSaders();
-			CreateMesh();
+			if (vbo == null)
+			{
+				CreateSaders();
+				CreateMesh();
+			}
 		}
 
 		private void CreateSaders()
@@ -133,11 +146,43 @@ namespace Scene
 			}
 		}
 
+		static public Vertex[] GetGpuDataAsFourPoints(TexturedRectangle tr)
+		{
+			return new []
+			{
+				new Vertex(tr.pos.startX, tr.pos.startY, tr.uv.startU + tr.offsetU, tr.uv.endV + tr.offsetV),
+				new Vertex(tr.pos.startX, tr.pos.endY,   tr.uv.startU + tr.offsetU, tr.uv.startV + tr.offsetV),
+				new Vertex(tr.pos.endX,   tr.pos.endY,   tr.uv.endU + tr.offsetU,   tr.uv.startV + tr.offsetV),
+				new Vertex(tr.pos.endX,   tr.pos.startY, tr.uv.endU + tr.offsetU,   tr.uv.endV + tr.offsetV)
+			};
+		}
+
+		static public Vertex[] GetGpuDataAsSixPoints(TexturedRectangle tr)
+		{
+			return new []
+			{
+				new Vertex(tr.pos.startX, tr.pos.startY, tr.uv.startU + tr.offsetU, tr.uv.endV + tr.offsetV),
+				new Vertex(tr.pos.startX, tr.pos.endY,   tr.uv.startU + tr.offsetU, tr.uv.startV + tr.offsetV),
+				new Vertex(tr.pos.endX,   tr.pos.endY,   tr.uv.endU + tr.offsetU,   tr.uv.startV + tr.offsetV),
+				new Vertex(tr.pos.startX, tr.pos.startY, tr.uv.startU + tr.offsetU, tr.uv.endV + tr.offsetV),
+				new Vertex(tr.pos.endX,   tr.pos.endY,   tr.uv.endU + tr.offsetU,   tr.uv.startV + tr.offsetV),
+				new Vertex(tr.pos.endX,   tr.pos.startY, tr.uv.endU + tr.offsetU,   tr.uv.endV + tr.offsetV)
+			};
+		}
+
 		private void CreateMesh()
 		{
 			if (vbo == null)
+			{
 				vbo = new VBO();
-			RecalculateMesh();
+			}
+			else
+			{
+				return;
+			}
+
+			vbo.SetData(GetGpuDataAsFourPoints(this));
+
 			if (vao == null)
 				vao = new VAO(4);
 			vao.AttachVBO(0, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 0);
@@ -148,12 +193,7 @@ namespace Scene
 
 		private void RecalculateMesh()
 		{
-			vbo.SetData(new[] {
-				new Vertex(posSegment.startX, posSegment.startY, uvSegment.startU + offsetU, uvSegment.endV + offsetV),
-				new Vertex(posSegment.startX,   posSegment.endY, uvSegment.startU + offsetU, uvSegment.startV + offsetV),
-				new Vertex(  posSegment.endX,   posSegment.endY, uvSegment.endU + offsetU,   uvSegment.startV + offsetV),
-				new Vertex(  posSegment.endX, posSegment.startY, uvSegment.endU + offsetU,   uvSegment.endV + offsetV)
-			});
+			vbo.SetSubData(GetGpuDataAsFourPoints(this), 4);
 		}
 
 		public override void Draw()

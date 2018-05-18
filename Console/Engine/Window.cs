@@ -25,6 +25,7 @@ namespace Game
 			GraphicsContextFlags.ForwardCompatible)
 		{
 			window = this;
+			this.VSync = VSyncMode.On;
 			Run(60 /*FPS*/);
 		}
 

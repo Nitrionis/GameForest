@@ -9,25 +9,27 @@ namespace Graphics
 	{
 		private const int InvalidHandle = -1;
 
-		public int Handle { get; private set; } // Идентификатор VBO
-		public BufferTarget Type { get; private set; } // Тип VBO
+		public int handle { get; private set; } // Идентификатор VBO
+		public BufferTarget target { get; private set; } // Тип VBO
+		public BufferUsageHint usage { get; private set; }
 
-		public VBO(BufferTarget type = BufferTarget.ArrayBuffer)
+		public VBO(BufferTarget target = BufferTarget.ArrayBuffer, BufferUsageHint usage = BufferUsageHint.DynamicDraw)
 		{
-			Type = type;
+			this.target = target;
+			this.usage = usage;
 			AcquireHandle();
 		}
 
 		// Создаёт новый VBO и сохраняет его идентификатор в свойство Handle
 		private void AcquireHandle()
 		{
-			Handle = GL.GenBuffer();
+			handle = GL.GenBuffer();
 		}
 
 		// Делает данный VBO текущим
 		public void Bind()
 		{
-			GL.BindBuffer(Type, Handle);
+			GL.BindBuffer(target, handle);
 		}
 
 		// Заполняет VBO массивом data
@@ -37,18 +39,25 @@ namespace Graphics
 				throw new ArgumentException("Массив должен содержать хотя бы один элемент", "data");
 
 			Bind();
-			GL.BufferData(Type, (IntPtr)(data.Length * Marshal.SizeOf(typeof(T))), data, BufferUsageHint.StaticDraw);
+			GL.BufferData(target, (IntPtr)(data.Length * Marshal.SizeOf(typeof(T))), data, usage);
+		}
+
+		// Заполняет часть VBO массивом data
+		public void SetSubData<T>(T[] data, int size, int offset = 0) where T : struct
+		{
+			Bind();
+			GL.BufferSubData(target, (IntPtr)(offset * Marshal.SizeOf(typeof(T))), (IntPtr)(size * Marshal.SizeOf(typeof(T))), data);
 		}
 
 		// Освобождает занятые данным VBO ресурсы
 		private void ReleaseHandle()
 		{
-			if (Handle == InvalidHandle)
+			if (handle == InvalidHandle)
 				return;
 
-			GL.DeleteBuffer(Handle);
+			GL.DeleteBuffer(handle);
 
-			Handle = InvalidHandle;
+			handle = InvalidHandle;
 		}
 
 		public void Dispose()
