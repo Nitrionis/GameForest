@@ -60,7 +60,7 @@ namespace Scene
 		public Texture texture;
 		public VBO vbo;
 		public VAO vao;
-		public ShaderProgram shaderProgram = new ShaderProgram();
+		public ShaderProgram shaderProgram;
 
 		[StructLayout(LayoutKind.Sequential)]
 		public struct Vertex
@@ -102,13 +102,14 @@ namespace Scene
 		{
 			if (vbo == null)
 			{
-				CreateSaders();
+				shaderProgram = GetShaderProgram();
 				CreateMesh();
 			}
 		}
 
-		private void CreateSaders()
+		static public ShaderProgram GetShaderProgram()
 		{
+			ShaderProgram shaderProgram = new ShaderProgram();
 			using (var vertexShader = new Shader(ShaderType.VertexShader))
 			using (var fragmentShader = new Shader(ShaderType.FragmentShader))
 			{
@@ -144,74 +145,65 @@ namespace Scene
 				shaderProgram.AttachShader(fragmentShader);
 				shaderProgram.Link();
 			}
+			return shaderProgram;
 		}
 
-		static public Vertex[] GetGpuDataAsFourPoints(TexturedRectangle tr)
+		public Vertex[] GetGpuDataAsFourPoints()
 		{
 			return new []
 			{
-				new Vertex(tr.pos.startX, tr.pos.startY, tr.uv.startU + tr.offsetU, tr.uv.endV + tr.offsetV),
-				new Vertex(tr.pos.startX, tr.pos.endY,   tr.uv.startU + tr.offsetU, tr.uv.startV + tr.offsetV),
-				new Vertex(tr.pos.endX,   tr.pos.endY,   tr.uv.endU + tr.offsetU,   tr.uv.startV + tr.offsetV),
-				new Vertex(tr.pos.endX,   tr.pos.startY, tr.uv.endU + tr.offsetU,   tr.uv.endV + tr.offsetV)
+				new Vertex(pos.startX, pos.startY, uv.startU + offsetU, uv.endV   + offsetV),
+				new Vertex(pos.startX, pos.endY,   uv.startU + offsetU, uv.startV + offsetV),
+				new Vertex(pos.endX,   pos.endY,   uv.endU   + offsetU, uv.startV + offsetV),
+				new Vertex(pos.endX,   pos.startY, uv.endU   + offsetU, uv.endV   + offsetV)
 			};
 		}
 
-		static public Vertex[] GetGpuDataAsSixPoints(TexturedRectangle tr)
+		public Vertex[] GetGpuDataAsSixPoints()
 		{
 			return new []
 			{
-				new Vertex(tr.pos.startX, tr.pos.startY, tr.uv.startU + tr.offsetU, tr.uv.endV + tr.offsetV),
-				new Vertex(tr.pos.startX, tr.pos.endY,   tr.uv.startU + tr.offsetU, tr.uv.startV + tr.offsetV),
-				new Vertex(tr.pos.endX,   tr.pos.endY,   tr.uv.endU + tr.offsetU,   tr.uv.startV + tr.offsetV),
-				new Vertex(tr.pos.startX, tr.pos.startY, tr.uv.startU + tr.offsetU, tr.uv.endV + tr.offsetV),
-				new Vertex(tr.pos.endX,   tr.pos.endY,   tr.uv.endU + tr.offsetU,   tr.uv.startV + tr.offsetV),
-				new Vertex(tr.pos.endX,   tr.pos.startY, tr.uv.endU + tr.offsetU,   tr.uv.endV + tr.offsetV)
+				new Vertex(pos.startX, pos.startY, uv.startU + offsetU, uv.endV   + offsetV),
+				new Vertex(pos.startX, pos.endY,   uv.startU + offsetU, uv.startV + offsetV),
+				new Vertex(pos.endX,   pos.endY,   uv.endU   + offsetU, uv.startV + offsetV),
+				new Vertex(pos.startX, pos.startY, uv.startU + offsetU, uv.endV   + offsetV),
+				new Vertex(pos.endX,   pos.endY,   uv.endU   + offsetU, uv.startV + offsetV),
+				new Vertex(pos.endX,   pos.startY, uv.endU   + offsetU, uv.endV   + offsetV)
 			};
 		}
 
 		private void CreateMesh()
 		{
-			if (vbo == null)
-			{
-				vbo = new VBO();
-			}
-			else
-			{
+			if (vbo != null)
 				return;
-			}
 
-			vbo.SetData(GetGpuDataAsFourPoints(this));
-
-			if (vao == null)
-				vao = new VAO(4);
+			vbo = new VBO();
+			vbo.SetData(GetGpuDataAsFourPoints());
+			vao = new VAO(4);
 			vao.AttachVBO(0, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 0);
 			vao.AttachVBO(1, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 2 * sizeof(float));
 			vao.PrimitiveType = PrimitiveType.TriangleFan;
-
 		}
 
 		private void RecalculateMesh()
 		{
-			vbo.SetSubData(GetGpuDataAsFourPoints(this), 4);
+			vbo.SetSubData(GetGpuDataAsFourPoints(), 4);
 		}
 
 		public override void Draw()
 		{
+			if (updateFlaf)
+			{
+				RecalculateMesh();
+				updateFlaf = false;
+			}
 			if (vao != null)
 			{
-				if (updateFlaf)
-				{
-					RecalculateMesh();
-					updateFlaf = false;
-				}
 				shaderProgram.Use();
 				if (texture != null)
 					texture.Bind();
 				vao.Draw();
 			}
 		}
-
-
 	}
 }

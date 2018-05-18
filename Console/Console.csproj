@@ -55,7 +55,7 @@
     <Compile Include="Engine\Graphics\VBO.cs" />
     <Compile Include="Engine\Scene\EndUiScene.cs" />
     <Compile Include="Engine\Scene\GameObject\TexturedRectangle.cs" />
-    <Compile Include="Engine\Scene\GameObject\SquaresGroup.cs" />
+    <Compile Include="Engine\Scene\GameObject\SnackGroup.cs" />
     <Compile Include="Engine\Scene\GameObject\GameObject.cs" />
     <Compile Include="Engine\Scene\MainScene.cs" />
     <Compile Include="Engine\Scene\Scene.cs" />
