@@ -31,15 +31,6 @@ namespace Scene
 
 		public PosSegment(float startX, float startY, float endX, float endY)
 		{
-			if (startX < -1) startX = -1;
-			if (startX > 1) startX = 1;
-			if (startY < -1) startY = -1;
-			if (startY > 1) startY = 1;
-			if (endX < -1) endX = -1;
-			if (endX > 1) endX = 1;
-			if (endY < -1) endY = -1;
-			if (endY > 1) endY = 1;
-
 			this.startX = startX;
 			this.startY = startY;
 			this.endX = endX;

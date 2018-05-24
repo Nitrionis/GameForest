@@ -43,8 +43,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Engine\Scene\EndScene\EndUiScene.cs" />
     <Compile Include="Engine\Scene\GameObject\Button.cs" />
+    <Compile Include="Engine\Scene\GameObject\GameObject.cs" />
     <Compile Include="Engine\Scene\GameObject\TextObject.cs" />
+    <Compile Include="Engine\Scene\MainScene\ExplosionsGroup.cs" />
+    <Compile Include="Engine\Scene\MainScene\MainScene.cs" />
+    <Compile Include="Engine\Scene\MainScene\MapGenerator.cs" />
+    <Compile Include="Engine\Scene\MainScene\SnackGroup.cs" />
+    <Compile Include="Engine\Scene\StartScene\StartUiScene.cs" />
     <Compile Include="Engine\Synchronization.cs" />
     <Compile Include="Engine\Window.cs" />
     <Compile Include="Engine\GlobalReference.cs" />
@@ -53,13 +60,8 @@
     <Compile Include="Engine\Graphics\Texture.cs" />
     <Compile Include="Engine\Graphics\VAO.cs" />
     <Compile Include="Engine\Graphics\VBO.cs" />
-    <Compile Include="Engine\Scene\EndUiScene.cs" />
     <Compile Include="Engine\Scene\GameObject\TexturedRectangle.cs" />
-    <Compile Include="Engine\Scene\GameObject\SnackGroup.cs" />
-    <Compile Include="Engine\Scene\GameObject\GameObject.cs" />
-    <Compile Include="Engine\Scene\MainScene.cs" />
     <Compile Include="Engine\Scene\Scene.cs" />
-    <Compile Include="Engine\Scene\StartUiScene.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

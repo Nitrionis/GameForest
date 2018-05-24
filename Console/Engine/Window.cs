@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Timers;
+using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
@@ -16,7 +17,8 @@ namespace Game
 		public volatile bool sceneChanging = false;
 
 		public Window() : base(
-			800/*width*/, 600/*height*/,
+			SystemInformation.PrimaryMonitorMaximizedWindowSize.Height - 50,
+			SystemInformation.PrimaryMonitorMaximizedWindowSize.Height - 50,
 			GraphicsMode.Default,
 			"Ночной ДОЖОР",
 			GameWindowFlags.Default,
@@ -25,7 +27,9 @@ namespace Game
 			GraphicsContextFlags.ForwardCompatible)
 		{
 			window = this;
-			this.VSync = VSyncMode.On;
+			X = 0;
+			Y = 0;
+			VSync = VSyncMode.On;
 			Run(60 /*FPS*/);
 		}
 
