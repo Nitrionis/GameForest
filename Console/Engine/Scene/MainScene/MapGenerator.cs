@@ -6,6 +6,8 @@ namespace Scene
 	{
 		public const int UniqueSnacksCount = 5;
 
+		public const int DeletedSnack = -1;
+
 		public int size_by_x, size_by_y;
 
 		public int[,] map { get; private set; }

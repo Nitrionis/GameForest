@@ -20,18 +20,19 @@ namespace Scene
 		protected struct Snack
 		{
 			public TexturedRectangle graphics;
+			public int vboOffset;
 			public bool deleteFlag;
 
-			public Snack(TexturedRectangle texturedRectangle, bool flag = false)
+			public Snack(TexturedRectangle texturedRectangle, int vboOffset, bool flag = false)
 			{
 				graphics = texturedRectangle;
+				this.vboOffset = vboOffset;
 				deleteFlag = flag;
 			}
 		}
 
 		protected Snack[,] snacks;
 
-		//protected TexturedRectangle[,] snacksTexturedRects;
 		protected Button[,] snacksButtons;
 
 		public MapGenerator mapGenerator { get; private set; }
@@ -50,7 +51,6 @@ namespace Scene
 			this.sizeX = sizeX;
 			this.sizeY = sizeY;
 
-			//snacksTexturedRects = new TexturedRectangle[sizeY, sizeX];
 			snacks = new Snack[sizeY, sizeX];
 			snacksButtons = new Button[sizeY, sizeX];
 			moveOffsets = new float[sizeX * sizeY];
@@ -83,8 +83,6 @@ namespace Scene
 		{
 			vbo = new VBO();
 
-			Random random = new Random();
-
 			mapGenerator = new MapGenerator();
 			mapGenerator.NewMap();
 
@@ -102,7 +100,8 @@ namespace Scene
 					snacks[y,x] = new Snack(new TexturedRectangle(
 						vbo,
 						new PosSegment(startX,  startY, endX, endY),
-						new UvSegment(0.125f * eatId, 0.0f, 0.125f * (eatId+1), 0.125f)));
+						new UvSegment(0.125f * eatId, 0.0f, 0.125f * (eatId+1), 0.125f)),
+						(8*y + x)*6);
 
 					TexturedRectangle.Vertex[] dataPerSnack = snacks[y,x].graphics.GetGpuDataAsSixPoints();
 
@@ -173,14 +172,35 @@ namespace Scene
 			uniformOffsetsHandler = shaderProgram.GetUniformLocation("offsets");
 		}
 
-		public void DeleteVerticalLineOfSnacks(int x, int y, int height = 1)
-		{
-
-		}
-
 		private void DeleteSnacks()
 		{
+			for (int x = 0; x < sizeX; x++)
+			{
+				for (int srcIndex = 1, dstIndex = 0; srcIndex < sizeY; srcIndex++, dstIndex++)
+				{
+					for (; srcIndex < sizeY; srcIndex++, dstIndex++)
+						if (snacks[dstIndex, x].deleteFlag)
+							break;
 
+					Snack value = snacks[dstIndex, x];
+					snacks[dstIndex, x] = snacks[srcIndex, x];
+					snacks[srcIndex, x] = value;
+
+					float startX = x * 0.2f - 1, startY = dstIndex * 0.2f - 1;
+					float endX = startX + 0.2f, endY = startY + 0.2f;
+				}
+
+				for (int y = sizeY; y >= 0; y--)
+				{
+					if (snacks[y, x].deleteFlag)
+					{
+						float startX = x * 0.2f - 1, startY = y * 0.2f - 1;
+						float endX = startX + 0.2f, endY = startY + 0.2f;
+
+
+					}
+				}
+			}
 		}
 
 		public override void Draw()

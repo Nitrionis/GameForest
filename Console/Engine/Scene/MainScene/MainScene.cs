@@ -22,8 +22,6 @@ namespace Game
 		private TextObject scoreObject;
 		private TextObject timeObject;
 
-		Stopwatch sw = new Stopwatch();
-
 		public MainScene()
 		{
 			Texture mainAtlas = new Texture("D:/pdf_sit/GameForest/Console/resources/MainScene/atlas.png");
@@ -51,8 +49,6 @@ namespace Game
 			Instantiate(timeObject);
 
 			GL.ClearColor(new Color4(34, 34, 34, 255));
-
-			sw.Start();
 		}
 
 		private void CreateBackGroung()
@@ -97,7 +93,7 @@ namespace Game
 
 		}
 
-		private int seconds = 0;
+		private int seconds;
 
 		Random random = new Random();
 
@@ -111,7 +107,6 @@ namespace Game
 				for (int i = 0; i < expCount; i++)
 				{
 					explosionsGroup.CreateExplosionIn(random.Next(8), random.Next(8));
-
 				}
 			}
 
