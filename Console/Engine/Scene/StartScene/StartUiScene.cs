@@ -32,8 +32,8 @@ namespace Game
 		public StartUiScene()
 		{
 			TexturedRectangle texturedRectangle = new TexturedRectangle(
-				new PosSegment(-0.3f,  -0.1f, 0.3f, 0.1f),
-				new UvSegment(0.0f, 0.0f, 0.125f*3, 0.125f));
+				new RectLocation(-0.3f,  -0.1f, 0.3f, 0.1f),
+				new RectUv(0.0f, 0.0f, 0.125f*3, 0.125f));
 
 			texturedRectangle.texture = new Texture("D:/pdf_sit/GameForest/Console/resources/StartUiScene/atlas.png");
 			Instantiate(texturedRectangle);

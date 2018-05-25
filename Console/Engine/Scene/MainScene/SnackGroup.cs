@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using System.Diagnostics;
 using Graphics;
 using OpenTK.Graphics.OpenGL4;
 
@@ -7,42 +7,31 @@ namespace Scene
 {
 	public class SnackGroup : GameObject
 	{
-		protected Game.Scene scene;
+		private Game.Scene scene;
 
-		protected int uniformTimeHandler;
-		protected int uniformOffsetsHandler;
+		private int uniformTimeHandler;
+		private int uniformOffsetsHandler;
 
-		protected VBO vbo;
-		protected VAO vao;
-		protected Texture texture;
-		protected ShaderProgram shaderProgram;
+		private VBO vbo;
+		private VAO vao;
+		private Texture texture;
+		private ShaderProgram shaderProgram;
 
-		protected struct Snack
-		{
-			public TexturedRectangle graphics;
-			public int vboOffset;
-			public bool deleteFlag;
+		private Snack[,] snacks;
 
-			public Snack(TexturedRectangle texturedRectangle, int vboOffset, bool flag = false)
-			{
-				graphics = texturedRectangle;
-				this.vboOffset = vboOffset;
-				deleteFlag = flag;
-			}
-		}
-
-		protected Snack[,] snacks;
-
-		protected Button[,] snacksButtons;
+		private Button[,] snacksButtons;
 
 		public MapGenerator mapGenerator { get; private set; }
 
-		protected float time;
-		protected float[] moveOffsets;
-		protected int[,] snacksMap;
+		private float time;
+		private float[] moveOffsets;
 
-		protected int sizeX;
-		protected int sizeY;
+		private int sizeX;
+		private int sizeY;
+
+		private const float UvSnackSize = 0.125f;
+		private const float XySnackSize = 0.2f;
+		private const int VertexPerSnack = 6;
 
 		public SnackGroup(Game.Scene scene, Texture texture, int sizeX, int sizeY)
 		{
@@ -53,8 +42,7 @@ namespace Scene
 
 			snacks = new Snack[sizeY, sizeX];
 			snacksButtons = new Button[sizeY, sizeX];
-			moveOffsets = new float[sizeX * sizeY];
-			snacksMap = new int[sizeY, sizeX];
+			moveOffsets = new float[sizeY * sizeX];
 
 			CreateShaderProgram();
 			CreateMesh();
@@ -62,20 +50,35 @@ namespace Scene
 
 		class ButtonCheker : IButtonAction
 		{
-			private TexturedRectangle texturedRectangle;
-			public int x, y; // are used to determine the VBO segment responsible for this snack
+			private Snack snack;
 
-			public ButtonCheker(TexturedRectangle texturedRectangle, int x, int y)
+			public ButtonCheker(Snack snack)
 			{
-				this.texturedRectangle = texturedRectangle;
-				this.x = x;
-				this.y = y;
+				this.snack = snack;
 			}
 
 			public void Event(int state)
 			{
-				texturedRectangle.offsetU = 0.125f * state;
-				texturedRectangle.vbo.SetSubData(texturedRectangle.GetGpuDataAsSixPoints(), 6, (8*y + x)*6);
+				snack.offsetU = UvSnackSize * state;
+				snack.vbo.SetSubData(new []
+				{
+					/* Когда обновляем данные снэков, необходимо пересчитывать
+					 * позиции по Y, так как они не связаны с данными на видеокарте,
+					 * а используются для определения кликов по снэкам
+					 */
+					new TexturedRectangle.Vertex(snack.pos.startX, -1.0f,
+						snack.uv.startU + snack.offsetU, snack.uv.endV),
+					new TexturedRectangle.Vertex(snack.pos.startX, -1.0f + XySnackSize,
+						snack.uv.startU + snack.offsetU, snack.uv.startV),
+					new TexturedRectangle.Vertex(snack.pos.endX,   -1.0f + XySnackSize,
+						snack.uv.endU   + snack.offsetU, snack.uv.startV),
+					new TexturedRectangle.Vertex(snack.pos.startX, -1.0f,
+						snack.uv.startU + snack.offsetU, snack.uv.endV),
+					new TexturedRectangle.Vertex(snack.pos.endX,   -1.0f + XySnackSize,
+						snack.uv.endU   + snack.offsetU, snack.uv.startV),
+					new TexturedRectangle.Vertex(snack.pos.endX,   -1.0f,
+						snack.uv.endU   + snack.offsetU, snack.uv.endV)
+				}, 6, snack.vboDataOffset);
 			}
 		}
 
@@ -86,33 +89,36 @@ namespace Scene
 			mapGenerator = new MapGenerator();
 			mapGenerator.NewMap();
 
-			TexturedRectangle.Vertex[] data = new TexturedRectangle.Vertex[6 * sizeX * sizeY];
+			var data = new TexturedRectangle.Vertex[6 * sizeX * sizeY];
 
 			for (int y = 0; y < sizeY; y++)
 			{
 				for (int x = 0; x < sizeX; x++)
 				{
-					float startX = x * 0.2f - 1, startY = y * 0.2f - 1;
-					float endX = startX + 0.2f, endY = startY + 0.2f;
+					float startX = x * XySnackSize - 1f, startY = y * XySnackSize - 1f;
+					float endX = startX + XySnackSize, endY = startY + XySnackSize;
 
 					int eatId = mapGenerator.map[y, x];
 
-					snacks[y,x] = new Snack(new TexturedRectangle(
+					snacks[y, x] = new Snack(
 						vbo,
-						new PosSegment(startX,  startY, endX, endY),
-						new UvSegment(0.125f * eatId, 0.0f, 0.125f * (eatId+1), 0.125f)),
-						(8*y + x)*6);
+						new RectLocation(startX, -1.0f, endX, -0.8f),
+						new RectUv(UvSnackSize * eatId, 0.0f, UvSnackSize * (eatId + 1), UvSnackSize),
+						y, VertexPerSnack*(y*sizeX + x));
 
-					TexturedRectangle.Vertex[] dataPerSnack = snacks[y,x].graphics.GetGpuDataAsSixPoints();
+					var dataPerSnack = snacks[y,x].GetGpuDataAsSixPoints();
 
-					for (int srcIndex = 0, dstIndex = (sizeX*y + x)*6; srcIndex < 6; srcIndex++, dstIndex++)
+					for (int srcIndex = 0, dstIndex = VertexPerSnack*(sizeX*y + x); srcIndex < VertexPerSnack; srcIndex++, dstIndex++)
 					{
 						data[dstIndex] = dataPerSnack[srcIndex];
 					}
 
-					snacksButtons[y,x] = new Button(snacks[y,x].graphics);
+					snacks[y, x].pos.startY = startY;
+					snacks[y, x].pos.endY = endY;
 
-					ButtonCheker buttonCheker = new ButtonCheker(snacks[y,x].graphics, x, y);
+					snacksButtons[y,x] = new Button(snacks[y,x]);
+
+					ButtonCheker buttonCheker = new ButtonCheker(snacks[y,x]);
 					snacksButtons[y,x].listeners.Add(buttonCheker);
 					scene.Instantiate(snacksButtons[y,x]);
 				}
@@ -120,7 +126,7 @@ namespace Scene
 
 			vbo.SetData(data);
 
-			vao = new VAO(6 * sizeX * sizeY);
+			vao = new VAO(VertexPerSnack * sizeX * sizeY);
 			vao.AttachVBO(0, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 0);
 			vao.AttachVBO(1, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 2 * sizeof(float));
 			vao.PrimitiveType = PrimitiveType.Triangles;
@@ -172,6 +178,11 @@ namespace Scene
 			uniformOffsetsHandler = shaderProgram.GetUniformLocation("offsets");
 		}
 
+		public void DeleteSnack(int x, int y)
+		{
+			snacks[y, x].deleteFlag = true;
+		}
+
 		private void DeleteSnacks()
 		{
 			for (int x = 0; x < sizeX; x++)
@@ -180,24 +191,26 @@ namespace Scene
 				{
 					for (; srcIndex < sizeY; srcIndex++, dstIndex++)
 						if (snacks[dstIndex, x].deleteFlag)
+						{
+							Snack value = snacks[dstIndex, x];
+							snacks[dstIndex, x] = snacks[srcIndex, x];
+							snacks[srcIndex, x] = value;
 							break;
-
-					Snack value = snacks[dstIndex, x];
-					snacks[dstIndex, x] = snacks[srcIndex, x];
-					snacks[srcIndex, x] = value;
-
-					float startX = x * 0.2f - 1, startY = dstIndex * 0.2f - 1;
-					float endX = startX + 0.2f, endY = startY + 0.2f;
+						}
 				}
 
-				for (int y = sizeY; y >= 0; y--)
+				for (int y = sizeY - 1; y >= 0; y--)
 				{
+					float startY = y * XySnackSize - 1;
+					float endY = startY + XySnackSize;
+
+					snacks[y, x].pos.startY = startY;
+					snacks[y, x].pos.endY = endY;
+
 					if (snacks[y, x].deleteFlag)
 					{
-						float startX = x * 0.2f - 1, startY = y * 0.2f - 1;
-						float endX = startX + 0.2f, endY = startY + 0.2f;
-
-
+						snacks[y, x].deleteFlag = false;
+						snacks[y, x].sw.Restart();
 					}
 				}
 			}
@@ -211,12 +224,26 @@ namespace Scene
 				time = DateTime.Now.Millisecond / 1000f;
 				if (DateTime.Now.Second % 2 != 0)
 					time = 1.0f - time;
-				for (int i = 0; i < moveOffsets.Length; i++)
+
+				if ((DateTime.Now.Second % 5 == 0) && (DateTime.Now.Millisecond < 20))
 				{
-					moveOffsets[i] = 1.0f - DateTime.Now.Millisecond / 1000f;
+					DeleteSnack(0,6);
 				}
+				DeleteSnacks();
+				for (int y = 0; y < sizeY; y++)
+				{
+					for (int x = 0; x < sizeX; x++)
+					{
+						long value = 1000 - snacks[y, x].sw.ElapsedMilliseconds;
+						if (value < 0)
+							value = 0;
+
+						moveOffsets[y * sizeX + x] = snacks[y, x].height * XySnackSize + value / 1000f;
+					}
+				}
+
 				GL.Uniform1(uniformTimeHandler, 1, ref time);
-				//GL.Uniform1(uniformOffsetsHandler, 64, moveOffsets);
+				GL.Uniform1(uniformOffsetsHandler, 64, moveOffsets);
 				if (texture != null)
 					texture.Bind();
 				vao.Draw();

@@ -35,17 +35,17 @@ namespace Game
 			Instantiate(explosionsGroup);
 
 			TexturedRectangle scoreText = new TexturedRectangle(
-				new PosSegment(-0.95f,  0.78f, -0.45f, 0.92f),
-				new UvSegment(0.5f, 0.125f, 1.0f, 0.25f));
+				new RectLocation(-0.95f,  0.78f, -0.45f, 0.92f),
+				new RectUv(0.5f, 0.125f, 1.0f, 0.25f));
 			scoreText.texture = mainAtlas;
 			Instantiate(scoreText);
 
 			scoreObject = new TextObject(
-				new PosSegment(-0.4f,  0.8f, -0.3f, 0.9f), "0123456789");
+				new RectLocation(-0.4f,  0.8f, -0.3f, 0.9f), "0123456789");
 			Instantiate(scoreObject);
 
 			timeObject = new TextObject(
-				new PosSegment(0.7f,  0.0f, 0.8f, 0.1f), "0123456789");
+				new RectLocation(0.7f,  0.0f, 0.8f, 0.1f), "0123456789");
 			Instantiate(timeObject);
 
 			GL.ClearColor(new Color4(34, 34, 34, 255));
@@ -67,8 +67,8 @@ namespace Game
 
 					TexturedRectangle segment = new TexturedRectangle(
 						vbo,
-						new PosSegment(startX,  startY, endX, endY),
-						new UvSegment(0.0f, 0.9375f, 0.0625f, 1.0f));
+						new RectLocation(startX,  startY, endX, endY),
+						new RectUv(0.0f, 0.9375f, 0.0625f, 1.0f));
 
 					TexturedRectangle.Vertex[] dataPerSnack = segment.GetGpuDataAsSixPoints();
 
@@ -92,10 +92,10 @@ namespace Game
 			Instantiate(snackBackGround);
 
 		}
-
+		// TODO remove
 		private int seconds;
 
-		Random random = new Random();
+		private Random random = new Random();
 
 		public override void Update()
 		{

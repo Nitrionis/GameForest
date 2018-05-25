@@ -17,7 +17,7 @@ namespace Scene
 		public VBO vbo;
 		public VAO vao;
 		public ShaderProgram shaderProgram = new ShaderProgram();
-		public PosSegment posSegment { get; private set; }
+		public RectLocation RectLocation { get; private set; }
 
 		[StructLayout(LayoutKind.Sequential)]
 		struct Vertex
@@ -32,9 +32,9 @@ namespace Scene
 			}
 		}
 
-		public TextObject(PosSegment posSegment, string text)
+		public TextObject(RectLocation rectLocation, string text)
 		{
-			this.posSegment = posSegment;
+			this.RectLocation = rectLocation;
 			this.text = text;
 			Initialize();
 		}
@@ -130,23 +130,23 @@ namespace Scene
 				int charId = Convert.ToInt32(str[charIndex]) - firstCharId;
 
 				data[i]   = new Vertex(
-					posSegment.startX + offsetX, posSegment.startY,
+					RectLocation.startX + offsetX, RectLocation.startY,
 					0.044921875f * charId, 	0.625f + 0.0625f);
 				data[i+1] = new Vertex(
-					posSegment.startX + offsetX, posSegment.endY,
+					RectLocation.startX + offsetX, RectLocation.endY,
 					0.044921875f * charId, 	0.625f);
 				data[i+2] = new Vertex(
-					posSegment.endX + offsetX, posSegment.endY,
+					RectLocation.endX + offsetX, RectLocation.endY,
 					0.044921875f *(charId+1), 0.625f);
 
 				data[i+3]   = new Vertex(
-					posSegment.startX + offsetX, posSegment.startY,
+					RectLocation.startX + offsetX, RectLocation.startY,
 					0.044921875f * charId, 	0.625f + 0.0625f);
 				data[i+4] = new Vertex(
-					posSegment.endX + offsetX, posSegment.endY,
+					RectLocation.endX + offsetX, RectLocation.endY,
 					0.044921875f *(charId+1), 0.625f);
 				data[i+5] = new Vertex(
-					posSegment.endX + offsetX, posSegment.startY,
+					RectLocation.endX + offsetX, RectLocation.startY,
 					0.044921875f *(charId+1), 0.625f + 0.0625f);
 			}
 			vbo.SetSubData(data, data.Length);

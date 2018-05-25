@@ -31,7 +31,7 @@ namespace Scene
 		private void CheckEvents()
 		{
 			int newState;
-			PosSegment location = texturedRectangle.GetPosSegment();
+			RectLocation location = texturedRectangle.GetPosSegment();
 
 			double x = cursorPos.X / (double)window.Width * 2 - 1;
 			double y = (window.Height - cursorPos.Y) / (double)window.Height * 2 - 1;

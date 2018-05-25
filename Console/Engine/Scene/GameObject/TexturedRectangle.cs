@@ -6,14 +6,14 @@ using DrawBufferMode = OpenTK.Graphics.ES11.DrawBufferMode;
 
 namespace Scene
 {
-	public class UvSegment
+	public class RectUv
 	{
 		public float startU;
 		public float startV;
 		public float endU;
 		public float endV;
 
-		public UvSegment(float startU, float startV, float endU, float endV)
+		public RectUv(float startU, float startV, float endU, float endV)
 		{
 			this.startU = startU;
 			this.startV = startV;
@@ -22,14 +22,14 @@ namespace Scene
 		}
 	}
 
-	public class PosSegment
+	public class RectLocation
 	{
 		public float startX;
 		public float startY;
 		public float endX;
 		public float endY;
 
-		public PosSegment(float startX, float startY, float endX, float endY)
+		public RectLocation(float startX, float startY, float endX, float endY)
 		{
 			this.startX = startX;
 			this.startY = startY;
@@ -40,7 +40,7 @@ namespace Scene
 
 	public interface IRectangleGetter
 	{
-		PosSegment GetPosSegment();
+		RectLocation GetPosSegment();
 	}
 
 	public class TexturedRectangle : GameObject, IRectangleGetter
@@ -66,15 +66,15 @@ namespace Scene
 			}
 		}
 
-		public UvSegment uv { get; private set; }
-		public PosSegment pos { get; private set; }
+		public RectUv uv { get; private set; }
+		public RectLocation pos { get; private set; }
 
-		public PosSegment GetPosSegment()
+		public RectLocation GetPosSegment()
 		{
 			return pos;
 		}
 
-		public TexturedRectangle(VBO vbo, PosSegment pos, UvSegment uv)
+		public TexturedRectangle(VBO vbo, RectLocation pos, RectUv uv)
 		{
 			this.vbo = vbo;
 			this.pos = pos;
@@ -82,7 +82,7 @@ namespace Scene
 			Initialize();
 		}
 
-		public TexturedRectangle(PosSegment pos, UvSegment uv)
+		public TexturedRectangle(RectLocation pos, RectUv uv)
 		{
 			this.pos = pos;
 			this.uv = uv;

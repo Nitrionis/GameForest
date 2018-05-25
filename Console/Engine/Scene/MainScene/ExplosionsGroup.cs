@@ -7,17 +7,17 @@ namespace Scene
 {
 	public class ExplosionsGroup : GameObject
 	{
-		protected Game.Scene scene;
+		private Game.Scene scene;
 
-		protected int uniformBufferHandler;
+		private int uniformBufferHandler;
 
-		protected VBO vbo;
-		protected VAO vao;
-		protected Texture texture;
-		protected ShaderProgram shaderProgram;
+		private VBO vbo;
+		private VAO vao;
+		private Texture texture;
+		private ShaderProgram shaderProgram;
 
-		protected uint[] expData;
-		protected Stopwatch[] sw;
+		private uint[] expData;
+		private Stopwatch[] sw;
 
 		public int sizeX { get; private set; }
 		public int sizeY { get; private set; }
@@ -62,8 +62,8 @@ namespace Scene
 
 					TexturedRectangle snacksTexturedRects = new TexturedRectangle(
 						vbo,
-						new PosSegment(startX,  startY, endX, endY),
-						new UvSegment(0.0f, 0.125f, 0.125f, 0.25f));
+						new RectLocation(startX,  startY, endX, endY),
+						new RectUv(0.0f, 0.125f, 0.125f, 0.25f));
 
 					TexturedRectangle.Vertex[] dataPerSnack = snacksTexturedRects.GetGpuDataAsSixPoints();
 
@@ -141,6 +141,10 @@ namespace Scene
 						y_id = (uint) (time / 250);
 						x_id = (uint)(time - y_id * 250) / 63;
 						expData[i] = (y_id << 16) + x_id;
+						if (x_id != 0)
+						{
+							x_id = 0;
+						}
 					}
 					else
 					{
