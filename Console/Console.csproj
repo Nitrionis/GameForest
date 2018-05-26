@@ -52,6 +52,7 @@
     <Compile Include="Engine\Scene\MainScene\MapGenerator.cs" />
     <Compile Include="Engine\Scene\MainScene\Snack.cs" />
     <Compile Include="Engine\Scene\MainScene\SnackGroup.cs" />
+    <Compile Include="Engine\Scene\MainScene\SnackMap.cs" />
     <Compile Include="Engine\Scene\StartScene\StartUiScene.cs" />
     <Compile Include="Engine\Synchronization.cs" />
     <Compile Include="Engine\Window.cs" />

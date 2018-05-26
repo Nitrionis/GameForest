@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using Graphics;
 using OpenTK.Graphics.OpenGL4;
 
@@ -7,7 +6,7 @@ namespace Scene
 {
 	public class SnackGroup : GameObject
 	{
-		private Game.Scene scene;
+		protected Game.Scene scene;
 
 		private int uniformTimeHandler;
 		private int uniformOffsetsHandler;
@@ -17,21 +16,21 @@ namespace Scene
 		private Texture texture;
 		private ShaderProgram shaderProgram;
 
-		private Snack[,] snacks;
+		protected Snack[][] snacks;
 
 		private Button[,] snacksButtons;
 
-		public MapGenerator mapGenerator { get; private set; }
+		protected MapGenerator mapGenerator { get; private set; }
 
-		private float time;
-		private float[] moveOffsets;
+		protected float time;
+		protected float[] moveOffsets;
 
-		private int sizeX;
-		private int sizeY;
+		protected int sizeX;
+		protected int sizeY;
 
-		private const float UvSnackSize = 0.125f;
-		private const float XySnackSize = 0.2f;
-		private const int VertexPerSnack = 6;
+		protected const float UvSnackSize = 0.125f;
+		protected const float XySnackSize = 0.2f;
+		protected const int VertexPerSnack = 6;
 
 		public SnackGroup(Game.Scene scene, Texture texture, int sizeX, int sizeY)
 		{
@@ -40,9 +39,12 @@ namespace Scene
 			this.sizeX = sizeX;
 			this.sizeY = sizeY;
 
-			snacks = new Snack[sizeY, sizeX];
-			snacksButtons = new Button[sizeY, sizeX];
-			moveOffsets = new float[sizeY * sizeX];
+			snacks = new Snack[sizeX][];
+			for (int i = 0; i < sizeX; i++)
+				snacks[i] = new Snack[sizeY];
+
+			snacksButtons = new Button[sizeX, sizeY];
+			moveOffsets = new float[sizeX * sizeY];
 
 			CreateShaderProgram();
 			CreateMesh();
@@ -59,7 +61,12 @@ namespace Scene
 
 			public void Event(int state)
 			{
+				System.Console.WriteLine(snack.height);
 				snack.offsetU = UvSnackSize * state;
+				if (state == 2)
+				{
+					System.Console.WriteLine("state == 2");
+				}
 				snack.vbo.SetSubData(new []
 				{
 					/* Когда обновляем данные снэков, необходимо пересчитывать
@@ -89,7 +96,7 @@ namespace Scene
 			mapGenerator = new MapGenerator();
 			mapGenerator.NewMap();
 
-			var data = new TexturedRectangle.Vertex[6 * sizeX * sizeY];
+			var data = new TexturedRectangle.Vertex[VertexPerSnack * sizeX * sizeY];
 
 			for (int y = 0; y < sizeY; y++)
 			{
@@ -98,29 +105,33 @@ namespace Scene
 					float startX = x * XySnackSize - 1f, startY = y * XySnackSize - 1f;
 					float endX = startX + XySnackSize, endY = startY + XySnackSize;
 
-					int eatId = mapGenerator.map[y, x];
+					int eatId = mapGenerator.map[x, y];
 
-					snacks[y, x] = new Snack(
+					snacks[x][y] = new Snack(
 						vbo,
 						new RectLocation(startX, -1.0f, endX, -0.8f),
 						new RectUv(UvSnackSize * eatId, 0.0f, UvSnackSize * (eatId + 1), UvSnackSize),
 						y, VertexPerSnack*(y*sizeX + x));
 
-					var dataPerSnack = snacks[y,x].GetGpuDataAsSixPoints();
+					snacks[x][y].height = y;
+
+					var dataPerSnack = snacks[x][y].GetGpuDataAsSixPoints();
 
 					for (int srcIndex = 0, dstIndex = VertexPerSnack*(sizeX*y + x); srcIndex < VertexPerSnack; srcIndex++, dstIndex++)
 					{
 						data[dstIndex] = dataPerSnack[srcIndex];
 					}
 
-					snacks[y, x].pos.startY = startY;
-					snacks[y, x].pos.endY = endY;
+					snacks[x][y].pos.startY = startY;
+					snacks[x][y].pos.endY = endY;
 
-					snacksButtons[y,x] = new Button(snacks[y,x]);
+					snacksButtons[x,y] = new Button(snacks[x][y]);
 
-					ButtonCheker buttonCheker = new ButtonCheker(snacks[y,x]);
-					snacksButtons[y,x].listeners.Add(buttonCheker);
-					scene.Instantiate(snacksButtons[y,x]);
+					ButtonCheker buttonCheker = new ButtonCheker(snacks[x][y]);
+					snacksButtons[x,y].listeners.Add(buttonCheker);
+					scene.Instantiate(snacksButtons[x,y]);
+
+					moveOffsets[y * sizeX + x] = y * XySnackSize;
 				}
 			}
 
@@ -149,11 +160,14 @@ namespace Scene
 
 					layout(location = 0) out vec2 out_UV;
 
+					const float yPos[] = {-1.0f, -0.8f, -0.8f, -1.0f, -0.8f, -1.0f};
+
 					void main() {
-						vec2 pos = in_Position;
+						vec2 pos = vec2(in_Position.x, yPos[gl_VertexID % 6]);
 						pos.x += sin(time + pos.x * 10) * 0.01f;
-						pos.y += cos(time + pos.y * 10) * 0.01f + offsets[gl_VertexID / 6];
-    					gl_Position = vec4(pos, 0.0, 1.0);
+						float yOffset = offsets[gl_VertexID / 6];
+						pos.y += cos(time + pos.y + yOffset) * 0.01f + yOffset;
+    					gl_Position = vec4(pos, 0.0, 1.0f);
 						out_UV = in_UV;
 					}
 					");
@@ -178,40 +192,19 @@ namespace Scene
 			uniformOffsetsHandler = shaderProgram.GetUniformLocation("offsets");
 		}
 
-		public void DeleteSnack(int x, int y)
-		{
-			snacks[y, x].deleteFlag = true;
-		}
 
-		private void DeleteSnacks()
+
+		private void UpdateMoveOffset()
 		{
 			for (int x = 0; x < sizeX; x++)
 			{
-				for (int srcIndex = 1, dstIndex = 0; srcIndex < sizeY; srcIndex++, dstIndex++)
+				for (int y = 0; y < sizeY; y++)
 				{
-					for (; srcIndex < sizeY; srcIndex++, dstIndex++)
-						if (snacks[dstIndex, x].deleteFlag)
-						{
-							Snack value = snacks[dstIndex, x];
-							snacks[dstIndex, x] = snacks[srcIndex, x];
-							snacks[srcIndex, x] = value;
-							break;
-						}
-				}
-
-				for (int y = sizeY - 1; y >= 0; y--)
-				{
-					float startY = y * XySnackSize - 1;
-					float endY = startY + XySnackSize;
-
-					snacks[y, x].pos.startY = startY;
-					snacks[y, x].pos.endY = endY;
-
-					if (snacks[y, x].deleteFlag)
-					{
-						snacks[y, x].deleteFlag = false;
-						snacks[y, x].sw.Restart();
-					}
+					var snack = snacks[x][y];
+					long value = snack.animationTime - snack.sw.ElapsedMilliseconds;
+					if (value < 0)
+						value = 0;
+					moveOffsets[y * sizeX + x] = snack.height * XySnackSize + value / 1000f;
 				}
 			}
 		}
@@ -225,25 +218,12 @@ namespace Scene
 				if (DateTime.Now.Second % 2 != 0)
 					time = 1.0f - time;
 
-				if ((DateTime.Now.Second % 5 == 0) && (DateTime.Now.Millisecond < 20))
-				{
-					DeleteSnack(0,6);
-				}
-				DeleteSnacks();
-				for (int y = 0; y < sizeY; y++)
-				{
-					for (int x = 0; x < sizeX; x++)
-					{
-						long value = 1000 - snacks[y, x].sw.ElapsedMilliseconds;
-						if (value < 0)
-							value = 0;
 
-						moveOffsets[y * sizeX + x] = snacks[y, x].height * XySnackSize + value / 1000f;
-					}
-				}
+				UpdateMoveOffset();
 
 				GL.Uniform1(uniformTimeHandler, 1, ref time);
 				GL.Uniform1(uniformOffsetsHandler, 64, moveOffsets);
+
 				if (texture != null)
 					texture.Bind();
 				vao.Draw();

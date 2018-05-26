@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Graphics;
 using OpenTK.Graphics.OpenGL4;
 
@@ -21,6 +20,10 @@ namespace Scene
 
 		public int sizeX { get; private set; }
 		public int sizeY { get; private set; }
+
+		private const float UvSnackSize = 0.125f;
+		private const float XySnackSize = 0.2f;
+		private const int VertexPerSnack = 6;
 
 		public ExplosionsGroup(Game.Scene scene, Texture texture, int sizeX, int sizeY)
 		{
@@ -51,23 +54,24 @@ namespace Scene
 		{
 			vbo = new VBO(BufferTarget.ArrayBuffer, BufferUsageHint.StaticDraw);
 
-			TexturedRectangle.Vertex[] data = new TexturedRectangle.Vertex[6 * sizeX * sizeY];
+			var data = new TexturedRectangle.Vertex[6 * sizeX * sizeY];
 
 			for (int y = 0; y < sizeY; y++)
 			{
 				for (int x = 0; x < sizeX; x++)
 				{
-					float startX = x * 0.2f - 1 - 0.1f, startY = y * 0.2f - 1 - 0.1f;
-					float endX = startX + 0.2f + 0.2f, endY = startY + 0.2f + 0.2f;
+					float startX = x * XySnackSize - 1f - 0.1f, startY = y * XySnackSize - 1f - 0.1f;
+					float endX = startX + 2*XySnackSize, endY = startY + 2*XySnackSize;
 
-					TexturedRectangle snacksTexturedRects = new TexturedRectangle(
+					var snacksTexturedRects = new TexturedRectangle(
 						vbo,
 						new RectLocation(startX,  startY, endX, endY),
-						new RectUv(0.0f, 0.125f, 0.125f, 0.25f));
+						new RectUv(0.0f, UvSnackSize, UvSnackSize, 2*UvSnackSize));
 
 					TexturedRectangle.Vertex[] dataPerSnack = snacksTexturedRects.GetGpuDataAsSixPoints();
 
-					for (int srcIndex = 0, dstIndex = (sizeX*y + x)*6; srcIndex < 6; srcIndex++, dstIndex++)
+					for (int srcIndex = 0, dstIndex = VertexPerSnack*(sizeX*y + x);
+						srcIndex < VertexPerSnack; srcIndex++, dstIndex++)
 					{
 						data[dstIndex] = dataPerSnack[srcIndex];
 					}
@@ -76,7 +80,7 @@ namespace Scene
 
 			vbo.SetData(data);
 
-			vao = new VAO(6 * sizeX * sizeY);
+			vao = new VAO(VertexPerSnack * sizeX * sizeY);
 			vao.AttachVBO(0, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 0);
 			vao.AttachVBO(1, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 2 * sizeof(float));
 			vao.PrimitiveType = PrimitiveType.Triangles;
@@ -101,7 +105,7 @@ namespace Scene
 					void main() {
 						uint value = exp_id[gl_VertexID / 6];
 						vec2 uvOffset = vec2(
-								(value & 65535) * 0.125f,
+								(value & 0xff) * 0.125f,
 								(value >> 16) * 0.125f);
     					gl_Position = vec4(in_Position, 0.0, 1.0);
 						out_UV = in_UV + uvOffset;

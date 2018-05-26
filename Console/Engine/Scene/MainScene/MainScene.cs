@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using Graphics;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Input;
 using Scene;
-using Button = Scene.Button;
 
 namespace Game
 {
@@ -13,7 +10,7 @@ namespace Game
 	{
 		private DateTime endTime = DateTime.Now.AddMinutes(1);
 
-		private SnackGroup snackGroup;
+		private SnackMap snackMap;
 
 		private ExplosionsGroup explosionsGroup;
 
@@ -28,8 +25,8 @@ namespace Game
 
 			CreateBackGroung();
 
-			snackGroup = new SnackGroup(this, mainAtlas, 8, 8);
-			Instantiate(snackGroup);
+			snackMap = new SnackMap(this, mainAtlas, 8, 8);
+			Instantiate(snackMap);
 
 			explosionsGroup = new ExplosionsGroup(this, mainAtlas, 8, 8);
 			Instantiate(explosionsGroup);
