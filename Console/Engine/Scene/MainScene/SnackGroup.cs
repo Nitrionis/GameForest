@@ -104,7 +104,8 @@ namespace Scene
 					float startX = x * XySnackSize - 1f, startY = y * XySnackSize - 1f;
 					float endX = startX + XySnackSize, endY = startY + XySnackSize;
 
-					int eatId = mapGenerator.map[x, y];
+					//int eatId = mapGenerator.map[x, y];
+					int eatId = y / 4;
 
 					snacks[snackIndex] = new Snack(
 						vbo,
@@ -199,7 +200,7 @@ namespace Scene
 				long value = snack.animationTime - snack.sw.ElapsedMilliseconds;
 				if (value < 0)
 					value = 0;
-				moveOffsets[i] = snack.height * XySnackSize + value / 1000f;
+				moveOffsets[i] = snack.height * XySnackSize + value / 500f;
 			}
 		}
 

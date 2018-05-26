@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Graphics;
 
 namespace Scene
@@ -15,21 +16,27 @@ namespace Scene
 			sortBuffer = new int[sizeY];
 
 			map = new int[sizeX][];
-			for (int x = 0; x < sizeX; x++)
+			for (int snackIndex = 0, x = 0; x < sizeX; x++)
+			{
 				map[x] = new int[sizeY];
+				for (int y = 0; y < sizeX; y++, snackIndex++)
+					map[x][y] = snackIndex;
+			}
 		}
 
-		private int deleteCallCount = 0;
+		private int drawCallCount = 0;
 
 		public override void Draw()
 		{
-			if ((DateTime.Now.Second % 5 == 0) && (DateTime.Now.Millisecond < 20))
+			drawCallCount++;
+			if (drawCallCount % 300 == 0)
 			{
-				deleteCallCount++;
-				if (deleteCallCount > 1)
-					System.Console.WriteLine("deleteCallCount > 1");
+				System.Console.WriteLine("drawCallCount: " + drawCallCount / 300);
 
 				DeleteSnack(0, 0);
+				DeleteSnack(0, 1);
+				DeleteSnack(0, 2);
+				DeleteSnack(0, 3);
 				DeleteSnacks();
 			}
 			base.Draw();
@@ -49,6 +56,8 @@ namespace Scene
 		{
 			for (int x = 0; x < sizeX; x++)
 			{
+				if (x != 0)
+					continue;// TODO
 				for (int falseIndex = 0, trueIndex = sizeY - 1, y = 0; y < sizeY; y++)
 				{
 					if (GetSnack(x, y).deleteFlag)
@@ -67,9 +76,16 @@ namespace Scene
 				map[x] = sortBuffer;
 				sortBuffer = value;
 
+				System.Console.WriteLine("V Line");
+
+				if (drawCallCount == 5)
+					System.Console.WriteLine("Error");
+
 				for (int y = sizeY - 1; y >= 0; y--)
 				{
 					var snack = GetSnack(x, y);
+
+					//System.Console.WriteLine("PrevPos: " + map[x][y]);
 
 					snack.pos.startY = y * XySnackSize - 1f;
 					snack.pos.endY = (y + 1) * XySnackSize - 1f;
@@ -89,6 +105,7 @@ namespace Scene
 						snack.height = y;
 					}
 					snack.deleteFlag = false;
+					System.Console.WriteLine("NewPos: " + map[x][y]);
 				}
 			}
 		}
