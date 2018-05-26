@@ -18,18 +18,18 @@ namespace Scene
 		{
 			size_by_x = x;
 			size_by_y = y;
-			map = new int[y,x];
+			map = new int[x,y];
 			ResetMap();
 			NewMap();
 		}
 
 		public void ResetMap()
 		{
-			for (int y = 0; y < size_by_y; y++)
+			for (int x = 0; x < size_by_y; x++)
 			{
-				for (int x = 0; x < size_by_x; x++)
+				for (int y = 0; y < size_by_x; y++)
 				{
-					map[y, x] = -1;
+					map[x, y] = -1;
 				}
 			}
 		}
@@ -42,30 +42,30 @@ namespace Scene
 			{
 				snack = random.Next(UniqueSnacksCount);
 
-				if (x != 0 && map[y, x-1] == snack)
+				if (y != 0 && map[x, y-1] == snack)
 					continue;
 
-				if (x != size_by_x - 1 && map[y, x+1] == snack)
+				if (y != size_by_y - 1 && map[x, y+1] == snack)
 					continue;
 
-				if (y != 0 && map[y-1, x] == snack)
+				if (x != 0 && map[x-1, y] == snack)
 					continue;
 
-				if (y != size_by_y - 1 && map[y+1, x] == snack)
+				if (x != size_by_x - 1 && map[x+1, y] == snack)
 					continue;
 
 				break;
 			}
 
-			map[y, x] = autoset ? snack : map[y, x];
+			map[x, y] = autoset ? snack : map[x, y];
 			return snack;
 		}
 
 		public void NewMap()
 		{
-			for (int y = 0; y < size_by_y; y++)
+			for (int x = 0; x < size_by_x; x++)
 			{
-				for (int x = 0; x < size_by_x; x++)
+				for (int y = 0; y < size_by_y; y++)
 				{
 					NewSnack(x, y);
 				}
@@ -74,13 +74,13 @@ namespace Scene
 
 		public void UpdateMap()
 		{
-			for (int y = 0; y < size_by_y; y++)
+			for (int x = 0; x < size_by_x; x++)
 			{
-				for (int x = 0; x < size_by_x; x++)
+				for (int y = 0; y < size_by_y; y++)
 				{
-					if (map[y, x] == -1)
+					if (map[x, y] == -1)
 						//NewSnack(x, y);
-						map[y, x] = random.Next(UniqueSnacksCount);
+						map[x, y] = random.Next(UniqueSnacksCount);
 				}
 			}
 		}

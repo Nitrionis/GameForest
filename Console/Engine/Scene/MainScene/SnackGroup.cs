@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Graphics;
 using OpenTK.Graphics.OpenGL4;
 
@@ -16,7 +17,7 @@ namespace Scene
 		private Texture texture;
 		private ShaderProgram shaderProgram;
 
-		protected Snack[][] snacks;
+		protected Snack[] snacks;
 
 		private Button[,] snacksButtons;
 
@@ -39,9 +40,7 @@ namespace Scene
 			this.sizeX = sizeX;
 			this.sizeY = sizeY;
 
-			snacks = new Snack[sizeX][];
-			for (int i = 0; i < sizeX; i++)
-				snacks[i] = new Snack[sizeY];
+			snacks = new Snack[sizeX * sizeY];
 
 			snacksButtons = new Button[sizeX, sizeY];
 			moveOffsets = new float[sizeX * sizeY];
@@ -98,40 +97,40 @@ namespace Scene
 
 			var data = new TexturedRectangle.Vertex[VertexPerSnack * sizeX * sizeY];
 
-			for (int y = 0; y < sizeY; y++)
+			for (int snackIndex = 0, x = 0; x < sizeX; x++)
 			{
-				for (int x = 0; x < sizeX; x++)
+				for (int y = 0; y < sizeY; y++, snackIndex++)
 				{
 					float startX = x * XySnackSize - 1f, startY = y * XySnackSize - 1f;
 					float endX = startX + XySnackSize, endY = startY + XySnackSize;
 
 					int eatId = mapGenerator.map[x, y];
 
-					snacks[x][y] = new Snack(
+					snacks[snackIndex] = new Snack(
 						vbo,
 						new RectLocation(startX, -1.0f, endX, -0.8f),
 						new RectUv(UvSnackSize * eatId, 0.0f, UvSnackSize * (eatId + 1), UvSnackSize),
-						y, VertexPerSnack*(y*sizeX + x));
+						x, VertexPerSnack*(x * sizeY + y));
 
-					snacks[x][y].height = y;
+					snacks[snackIndex].height = y;
 
-					var dataPerSnack = snacks[x][y].GetGpuDataAsSixPoints();
+					var dataPerSnack = snacks[snackIndex].GetGpuDataAsSixPoints();
 
-					for (int srcIndex = 0, dstIndex = VertexPerSnack*(sizeX*y + x); srcIndex < VertexPerSnack; srcIndex++, dstIndex++)
+					for (int srcIndex = 0, dstIndex = VertexPerSnack*(x * sizeY + y); srcIndex < VertexPerSnack; srcIndex++, dstIndex++)
 					{
 						data[dstIndex] = dataPerSnack[srcIndex];
 					}
 
-					snacks[x][y].pos.startY = startY;
-					snacks[x][y].pos.endY = endY;
+					snacks[snackIndex].pos.startY = startY;
+					snacks[snackIndex].pos.endY = endY;
 
-					snacksButtons[x,y] = new Button(snacks[x][y]);
+					snacksButtons[x,y] = new Button(snacks[snackIndex]);
 
-					ButtonCheker buttonCheker = new ButtonCheker(snacks[x][y]);
+					ButtonCheker buttonCheker = new ButtonCheker(snacks[snackIndex]);
 					snacksButtons[x,y].listeners.Add(buttonCheker);
 					scene.Instantiate(snacksButtons[x,y]);
 
-					moveOffsets[y * sizeX + x] = y * XySnackSize;
+					moveOffsets[x * sizeY + y] = y * XySnackSize;
 				}
 			}
 
@@ -192,20 +191,15 @@ namespace Scene
 			uniformOffsetsHandler = shaderProgram.GetUniformLocation("offsets");
 		}
 
-
-
 		private void UpdateMoveOffset()
 		{
-			for (int x = 0; x < sizeX; x++)
+			for (int end = sizeX * sizeY, i = 0; i < end; i++)
 			{
-				for (int y = 0; y < sizeY; y++)
-				{
-					var snack = snacks[x][y];
-					long value = snack.animationTime - snack.sw.ElapsedMilliseconds;
-					if (value < 0)
-						value = 0;
-					moveOffsets[y * sizeX + x] = snack.height * XySnackSize + value / 1000f;
-				}
+				var snack = snacks[i];
+				long value = snack.animationTime - snack.sw.ElapsedMilliseconds;
+				if (value < 0)
+					value = 0;
+				moveOffsets[i] = snack.height * XySnackSize + value / 1000f;
 			}
 		}
 

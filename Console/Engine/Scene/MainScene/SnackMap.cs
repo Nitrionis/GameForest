@@ -5,12 +5,18 @@ namespace Scene
 {
 	public class SnackMap : SnackGroup
 	{
-		protected Snack[] sortBuffer;
+		private int[][] map;
+
+		protected int[] sortBuffer;
 
 		public SnackMap(Game.Scene scene, Texture texture, int sizeX, int sizeY)
 			: base(scene, texture, sizeX, sizeY)
 		{
-			sortBuffer = new Snack[sizeY];
+			sortBuffer = new int[sizeY];
+
+			map = new int[sizeX][];
+			for (int x = 0; x < sizeX; x++)
+				map[x] = new int[sizeY];
 		}
 
 		private int deleteCallCount = 0;
@@ -29,9 +35,14 @@ namespace Scene
 			base.Draw();
 		}
 
+		private Snack GetSnack(int x, int y)
+		{
+			return snacks[map[x][y]];
+		}
+
 		public void DeleteSnack(int x, int y)
 		{
-			snacks[x][y].deleteFlag = true;
+			GetSnack(x, y).deleteFlag = true;
 		}
 
 		private void DeleteSnacks()
@@ -40,25 +51,25 @@ namespace Scene
 			{
 				for (int falseIndex = 0, trueIndex = sizeY - 1, y = 0; y < sizeY; y++)
 				{
-					if (snacks[x][y].deleteFlag)
+					if (GetSnack(x, y).deleteFlag)
 					{
-						sortBuffer[trueIndex] = snacks[x][y];
+						sortBuffer[trueIndex] = map[x][y];
 						trueIndex--;
 					}
 					else
 					{
-						sortBuffer[falseIndex] = snacks[x][y];
+						sortBuffer[falseIndex] = map[x][y];
 						falseIndex++;
 					}
 				}
 
-				Snack[] value = snacks[x];
-				snacks[x] = sortBuffer;
+				int[] value = map[x];
+				map[x] = sortBuffer;
 				sortBuffer = value;
 
 				for (int y = sizeY - 1; y >= 0; y--)
 				{
-					var snack = snacks[x][y];
+					var snack = GetSnack(x, y);
 
 					snack.pos.startY = y * XySnackSize - 1f;
 					snack.pos.endY = (y + 1) * XySnackSize - 1f;
