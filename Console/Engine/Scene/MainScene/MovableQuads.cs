@@ -119,7 +119,6 @@ namespace Scene
 
 						if (xDist + yDist <= 1)
 						{
-							// TODO
 							var snackOne = snackMap.GetSnack(newPos.X, newPos.Y);
 							var snackTwo = snackMap.GetSnack(firstX, firstY);
 
@@ -136,7 +135,7 @@ namespace Scene
 								SetFirstQuadPos(-1, -1);
 								SetSecondQuadPos(-1, -1);
 
-								while (snackMap.CheckSequence());
+								//while (snackMap.CheckSequence());
 							}
 							else
 							{

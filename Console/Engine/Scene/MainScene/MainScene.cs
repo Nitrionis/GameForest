@@ -30,7 +30,7 @@ namespace Game
 
 		public MainScene()
 		{
-			Texture mainAtlas = new Texture("D:/pdf_sit/GameForest/Console/resources/MainScene/atlas.png");
+			Texture mainAtlas = new Texture(".\\resources\\MainScene\\atlas.png");
 
 			CreateBackGroung();
 
@@ -103,40 +103,34 @@ namespace Game
 			Instantiate(snackBackGround);
 
 		}
-		// TODO remove
-		private int seconds;
-		private Random random = new Random();
-		// end remove
+
+		private int score;
+		//private Random random = new Random();
 
 		public override void Update()
 		{
 			base.Update();
 
-			if (seconds % 200 == 0)
+			/*if (score % 200 == 0)
 			{
 				int expCount = random.Next(10);
-				//expCount = 0;
 				for (int i = 0; i < expCount; i++)
 				{
-					/*int x = random.Next(8), y = random.Next(8);
+					int x = random.Next(8), y = random.Next(8);
 					explosionsGroup.CreateExplosionIn(x, y);
-					snackMap.DeleteSnack(x, y);*/
+					snackMap.DeleteSnack(x, y);
 				}
-				//snackMap.DeleteSnacks();
-			}
+				snackMap.DeleteSnacks();
+			}*/
 
 			if (endTime > DateTime.Now)
 			{
-				CheckEvents();
 				timeObject.SetText((endTime - DateTime.Now).Seconds.ToString());
-				scoreObject.SetText(seconds.ToString());
-				seconds++;
+				scoreObject.SetText(score.ToString());
+				score++;
 			}
 		}
 
-		private void CheckEvents()
-		{
 
-		}
 	}
 }

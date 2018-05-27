@@ -1,0 +1,9 @@
+D:\pdf_sit\GameForest\Console\bin\Debug\Console.exe
+D:\pdf_sit\GameForest\Console\bin\Debug\Console.pdb
+D:\pdf_sit\GameForest\Console\obj\Debug\Console.csprojResolveAssemblyReference.cache
+D:\pdf_sit\GameForest\Console\obj\Debug\Console.csproj.CoreCompileInputs.cache
+D:\pdf_sit\GameForest\Console\obj\Debug\Console.exe
+D:\pdf_sit\GameForest\Console\obj\Debug\Console.pdb
+D:\pdf_sit\GameForest\Console\bin\Debug\OpenTK.dll
+D:\pdf_sit\GameForest\Console\bin\Debug\OpenTK.pdb
+D:\pdf_sit\GameForest\Console\bin\Debug\OpenTK.xml

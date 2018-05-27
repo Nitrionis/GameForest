@@ -1,4 +1,5 @@
-﻿using Game;
+﻿using System.IO;
+using Game;
 using Scene;
 using Graphics;
 using OpenTK.Input;
@@ -35,7 +36,8 @@ namespace Game
 				new RectLocation(-0.3f,  -0.1f, 0.3f, 0.1f),
 				new RectUv(0.0f, 0.0f, 0.125f*3, 0.125f));
 
-			texturedRectangle.texture = new Texture("D:/pdf_sit/GameForest/Console/resources/StartUiScene/atlas.png");
+			texturedRectangle.texture = new Texture(
+				".\\resources\\StartUiScene\\atlas.png");
 			Instantiate(texturedRectangle);
 
 			button = new Button(texturedRectangle);
