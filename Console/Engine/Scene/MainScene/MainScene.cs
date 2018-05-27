@@ -34,13 +34,14 @@ namespace Game
 
 			CreateBackGroung();
 
-			movableQuads = new MovableQuads(this, mainAtlas);
+			explosionsGroup = new ExplosionsGroup(this, mainAtlas, XyMapQuadSize, XyMapQuadSize);
+			snackMap = new SnackMap(this, explosionsGroup, mainAtlas, XyMapQuadSize, XyMapQuadSize);
+
+			movableQuads = new MovableQuads(this, snackMap, explosionsGroup, mainAtlas);
 			Instantiate(movableQuads);
 
-			snackMap = new SnackMap(this, mainAtlas, XyMapQuadSize, XyMapQuadSize);
 			Instantiate(snackMap);
 
-			explosionsGroup = new ExplosionsGroup(this, mainAtlas, XyMapQuadSize, XyMapQuadSize);
 			Instantiate(explosionsGroup);
 
 			TexturedRectangle scoreText = new TexturedRectangle(

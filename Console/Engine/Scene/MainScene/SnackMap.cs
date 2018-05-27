@@ -1,4 +1,5 @@
-﻿using Graphics;
+﻿using System;
+using Graphics;
 
 namespace Scene
 {
@@ -8,9 +9,15 @@ namespace Scene
 
 		protected int[] sortBuffer;
 
-		public SnackMap(Game.Scene scene, Texture texture, int sizeX, int sizeY)
+		private ExplosionsGroup explosionsGroup;
+
+		private Random random = new Random();
+
+		public SnackMap(Game.Scene scene,ExplosionsGroup explosionsGroup, Texture texture, int sizeX, int sizeY)
 			: base(scene, texture, sizeX, sizeY)
 		{
+			this.explosionsGroup = explosionsGroup;
+
 			sortBuffer = new int[sizeY];
 
 			map = new int[sizeX][];
@@ -22,25 +29,12 @@ namespace Scene
 			}
 		}
 
-		private int drawCallCount = 0;
-
 		public override void Draw()
 		{
-			drawCallCount++;
-			if (drawCallCount % 300 == 0)
-			{
-				//System.Console.WriteLine("drawCallCount: " + drawCallCount / 300);
-
-				/*DeleteSnack(0, 0);
-				DeleteSnack(0, 1);
-				DeleteSnack(0, 2);
-				DeleteSnack(0, 3);*/
-				//DeleteSnacks();
-			}
 			base.Draw();
 		}
 
-		private Snack GetSnack(int x, int y)
+		public Snack GetSnack(int x, int y)
 		{
 			return snacks[map[x][y]];
 		}
@@ -54,14 +48,17 @@ namespace Scene
 		{
 			for (int x = 0; x < sizeX; x++)
 			{
-				/*if (x != 0)
-					continue;// TODO*/
 				for (int falseIndex = 0, trueIndex = sizeY - 1, y = 0; y < sizeY; y++)
 				{
 					if (GetSnack(x, y).deleteFlag)
 					{
 						sortBuffer[trueIndex] = map[x][y];
 						trueIndex--;
+
+						Snack snack = GetSnack(x, y);
+						explosionsGroup.CreateExplosionIn(x, y);
+						snack.snackId = random.Next(5);
+						snack.UpdateUvOffsetUsingId();
 					}
 					else
 					{
@@ -74,16 +71,9 @@ namespace Scene
 				map[x] = sortBuffer;
 				sortBuffer = value;
 
-				/*System.Console.WriteLine("V Line");
-
-				if (drawCallCount == 5)
-					System.Console.WriteLine("Error");*/
-
 				for (int y = sizeY - 1; y >= 0; y--)
 				{
 					var snack = GetSnack(x, y);
-
-					//System.Console.WriteLine("PrevPos: " + map[x][y]);
 
 					snack.pos.startY = y * XySnackSize - 1f;
 					snack.pos.endY = (y + 1) * XySnackSize - 1f;
@@ -103,18 +93,19 @@ namespace Scene
 						snack.height = y;
 					}
 					snack.deleteFlag = false;
-					//System.Console.WriteLine("NewPos: " + map[x][y]);
 				}
 			}
 		}
 
-		public void CheckSequence()
+		public bool CheckSequence()
 		{
 			bool removeSnacks = false;
+			int adjacentCount;
+			Snack prevSnack;
 			for (int y = 0; y < sizeY; y++)
 			{
-				int adjacentCount = 1;
-				Snack prevSnack = GetSnack(0, y);
+				adjacentCount = 1;
+				prevSnack = GetSnack(0, y);
 				for (int x = 1; x < sizeX; x++)
 				{
 					if (adjacentCount == 0)
@@ -142,12 +133,21 @@ namespace Scene
 						adjacentCount = 0;
 					}
 				}
+				if (adjacentCount >= 3)
+				{
+					removeSnacks = true;
+					for (int end = sizeX - adjacentCount, i = sizeX - 1;
+						i >= end; i--)
+					{
+						DeleteSnack(i, y);
+					}
+				}
 			}
 
 			for (int x = 0; x < sizeX; x++)
 			{
-				int adjacentCount = 1;
-				Snack prevSnack = GetSnack(x, 0);
+				adjacentCount = 1;
+				prevSnack = GetSnack(x, 0);
 				for (int y = 1; y < sizeY; y++)
 				{
 					if (adjacentCount == 0)
@@ -167,18 +167,29 @@ namespace Scene
 						if (adjacentCount >= 3)
 						{
 							removeSnacks = true;
-							for (int end = x - adjacentCount, i = x - 1; i >= end; i--)
+							for (int end = y - adjacentCount, i = y - 1; i >= end; i--)
 							{
-								DeleteSnack(i, y);
+								DeleteSnack(x, i);
 							}
 						}
 						adjacentCount = 0;
+					}
+				}
+				if (adjacentCount >= 3)
+				{
+					removeSnacks = true;
+					for (int end = sizeY - adjacentCount, i = sizeY - 1;
+						i >= end; i--)
+					{
+						DeleteSnack(x, i);
 					}
 				}
 			}
 
 			if (removeSnacks)
 				DeleteSnacks();
+
+			return removeSnacks;
 		}
 	}
 }

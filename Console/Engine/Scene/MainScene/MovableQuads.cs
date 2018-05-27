@@ -12,8 +12,11 @@ namespace Scene
 
 		public ActiveQuad activeQuad { get; private set; } = ActiveQuad.Noactive;
 
-		protected const float UvQuadSize = 0.0625f;
-		protected const float XyQuadSize = 0.2f;
+		private const float UvQuadSize = 0.0625f;
+		private const float XyQuadSize = 0.2f;
+
+		private SnackMap snackMap;
+		private ExplosionsGroup explosionsGroup;
 
 		private TexturedRectangle rectangleOne;
 		private TexturedRectangle rectangleTwo;
@@ -23,24 +26,27 @@ namespace Scene
 		public int secondX { get; private set; }
 		public int secondY { get; private set; }
 
-		public MovableQuads(Game.Scene scene, Texture texture)
+		public MovableQuads(Game.Scene scene, SnackMap snackMap, ExplosionsGroup explosionsGroup, Texture texture)
 		{
+			this.snackMap = snackMap;
+			this.explosionsGroup = explosionsGroup;
+
 			rectangleOne = new TexturedRectangle(
-				new RectLocation(-1.0f, -1.0f, -1.0f + XyQuadSize, -1.0f + XyQuadSize),
+				new RectLocation(-1.0f, -1.0f, -1.0f, -1.0f),
 				new RectUv(2*UvQuadSize, 15*UvQuadSize, 3*UvQuadSize, 16*UvQuadSize));
 			rectangleOne.texture = texture;
 			scene.Instantiate(rectangleOne);
 
 			rectangleTwo = new TexturedRectangle(
-				new RectLocation(-1.0f + XyQuadSize, -1.0f + XyQuadSize, -1.0f + 2*XyQuadSize, -1.0f + 2*XyQuadSize),
+				new RectLocation(-1.0f, -1.0f, -1.0f, -1.0f),
 				new RectUv(2*UvQuadSize, 15*UvQuadSize, 3*UvQuadSize, 16*UvQuadSize));
 			rectangleTwo.texture = texture;
 			scene.Instantiate(rectangleTwo);
 
-			firstX = 0;
-			firstY = 0;
-			secondX = 1;
-			secondY = 1;
+			firstX = -1;
+			firstY = -1;
+			secondX = -1;
+			secondY = -1;
 		}
 
 		public void SetFirstQuadPos(int x, int y)
@@ -73,7 +79,6 @@ namespace Scene
 
 		public override void Update()
 		{
-			var state = Mouse.GetCursorState();
 			Point newPos = GlobalReference.cursorPos;
 			newPos.X /= (GlobalReference.window.Width / 10);
 			newPos.Y /= (GlobalReference.window.Height / 10);
@@ -86,15 +91,10 @@ namespace Scene
 					SetSecondQuadPos(newPos.X, newPos.Y);
 				}
 			}
-			if (state.LeftButton == ButtonState.Pressed)
-			{
-
-			}
 		}
 
 		public override void MbdDawn()
 		{
-			var state = Mouse.GetCursorState();
 			Point newPos = GlobalReference.cursorPos;
 			newPos.X /= (GlobalReference.window.Width / 10);
 			newPos.Y /= (GlobalReference.window.Height / 10);
@@ -120,10 +120,38 @@ namespace Scene
 						if (xDist + yDist <= 1)
 						{
 							// TODO
-							activeQuad = ActiveQuad.Noactive;
-							SetFirstQuadPos(-1, -1);
-							SetSecondQuadPos(-1, -1);
+							var snackOne = snackMap.GetSnack(newPos.X, newPos.Y);
+							var snackTwo = snackMap.GetSnack(firstX, firstY);
+
+							int value = snackOne.snackId;
+							snackOne.snackId = snackTwo.snackId;
+							snackTwo.snackId = value;
+
+							if (snackMap.CheckSequence())
+							{
+								snackOne.UpdateUvOffsetUsingId();
+								snackTwo.UpdateUvOffsetUsingId();
+
+								activeQuad = ActiveQuad.Noactive;
+								SetFirstQuadPos(-1, -1);
+								SetSecondQuadPos(-1, -1);
+
+								while (snackMap.CheckSequence());
+							}
+							else
+							{
+								System.Console.WriteLine("CheckSequence() false");
+								value = snackOne.snackId;
+								snackOne.snackId = snackTwo.snackId;
+								snackTwo.snackId = value;
+							}
 						}
+					}
+					else
+					{
+						activeQuad = ActiveQuad.Noactive;
+						SetFirstQuadPos(-1, -1);
+						SetSecondQuadPos(-1, -1);
 					}
 				}
 			}
