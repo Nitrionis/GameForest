@@ -33,11 +33,11 @@ namespace Scene
 			{
 				System.Console.WriteLine("drawCallCount: " + drawCallCount / 300);
 
-				DeleteSnack(0, 0);
+				/*DeleteSnack(0, 0);
 				DeleteSnack(0, 1);
 				DeleteSnack(0, 2);
-				DeleteSnack(0, 3);
-				DeleteSnacks();
+				DeleteSnack(0, 3);*/
+				//DeleteSnacks();
 			}
 			base.Draw();
 		}
@@ -52,12 +52,12 @@ namespace Scene
 			GetSnack(x, y).deleteFlag = true;
 		}
 
-		private void DeleteSnacks()
+		public void DeleteSnacks()
 		{
 			for (int x = 0; x < sizeX; x++)
 			{
-				if (x != 0)
-					continue;// TODO
+				/*if (x != 0)
+					continue;// TODO*/
 				for (int falseIndex = 0, trueIndex = sizeY - 1, y = 0; y < sizeY; y++)
 				{
 					if (GetSnack(x, y).deleteFlag)
@@ -76,10 +76,10 @@ namespace Scene
 				map[x] = sortBuffer;
 				sortBuffer = value;
 
-				System.Console.WriteLine("V Line");
+				/*System.Console.WriteLine("V Line");
 
 				if (drawCallCount == 5)
-					System.Console.WriteLine("Error");
+					System.Console.WriteLine("Error");*/
 
 				for (int y = sizeY - 1; y >= 0; y--)
 				{
@@ -105,7 +105,7 @@ namespace Scene
 						snack.height = y;
 					}
 					snack.deleteFlag = false;
-					System.Console.WriteLine("NewPos: " + map[x][y]);
+					//System.Console.WriteLine("NewPos: " + map[x][y]);
 				}
 			}
 		}

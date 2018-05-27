@@ -98,13 +98,19 @@ namespace Game
 		{
 			base.Update();
 
-			if (DateTime.Now.Millisecond < 20 || (DateTime.Now.Millisecond > 480 && DateTime.Now.Millisecond < 500))
+			if (seconds % 200 == 0)
 			{
-				int expCount = random.Next(10);
+				int expCount = random.Next(3);
+				expCount = 0; // TODO
 				for (int i = 0; i < expCount; i++)
 				{
-					explosionsGroup.CreateExplosionIn(random.Next(8), random.Next(8));
+					int x = random.Next(8), y = random.Next(8);
+					explosionsGroup.CreateExplosionIn(x, y);
+					snackMap.DeleteSnack(x, y);
 				}
+				snackMap.DeleteSnack(0, 0);
+				snackMap.DeleteSnack(0, 4);
+				snackMap.DeleteSnacks();
 			}
 
 			if (endTime > DateTime.Now)
