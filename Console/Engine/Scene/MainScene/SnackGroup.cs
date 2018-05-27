@@ -62,10 +62,9 @@ namespace Scene
 			{
 				System.Console.WriteLine(snack.height);
 				snack.offsetU = UvSnackSize * state;
-				if (state == 2)
-				{
-					System.Console.WriteLine("state == 2");
-				}
+
+				return;
+
 				snack.vbo.SetSubData(new []
 				{
 					/* Когда обновляем данные снэков, необходимо пересчитывать
@@ -104,16 +103,17 @@ namespace Scene
 					float startX = x * XySnackSize - 1f, startY = y * XySnackSize - 1f;
 					float endX = startX + XySnackSize, endY = startY + XySnackSize;
 
-					//int eatId = mapGenerator.map[x, y];
-					int eatId = y / 4;
+					int snackId = mapGenerator.map[x, y];
+					//int snackId = y / 4;
 
 					snacks[snackIndex] = new Snack(
 						vbo,
 						new RectLocation(startX, -1.0f, endX, -0.8f),
-						new RectUv(UvSnackSize * eatId, 0.0f, UvSnackSize * (eatId + 1), UvSnackSize),
+						new RectUv(UvSnackSize * snackId, 0.0f, UvSnackSize * (snackId + 1), UvSnackSize),
 						x, VertexPerSnack*(x * sizeY + y));
 
 					snacks[snackIndex].height = y;
+					snacks[snackIndex].snackId = snackId;
 
 					var dataPerSnack = snacks[snackIndex].GetGpuDataAsSixPoints();
 

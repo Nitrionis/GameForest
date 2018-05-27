@@ -8,7 +8,16 @@ namespace Game
 {
 	public class MainScene : Scene
 	{
+		private const float UvSnackSize = 0.125f;
+		private const float XySnackSize = 0.2f;
+		private const int VertexPerSnack = 6;
+
+		private const int BgQuadSize = 10; // Bg is background
+		private const int XyMapQuadSize = 8;
+
 		private DateTime endTime = DateTime.Now.AddMinutes(1);
+
+		private MovableQuads movableQuads;
 
 		private SnackMap snackMap;
 
@@ -25,20 +34,23 @@ namespace Game
 
 			CreateBackGroung();
 
-			snackMap = new SnackMap(this, mainAtlas, 8, 8);
+			movableQuads = new MovableQuads(this, mainAtlas);
+			Instantiate(movableQuads);
+
+			snackMap = new SnackMap(this, mainAtlas, XyMapQuadSize, XyMapQuadSize);
 			Instantiate(snackMap);
 
-			explosionsGroup = new ExplosionsGroup(this, mainAtlas, 8, 8);
+			explosionsGroup = new ExplosionsGroup(this, mainAtlas, XyMapQuadSize, XyMapQuadSize);
 			Instantiate(explosionsGroup);
 
 			TexturedRectangle scoreText = new TexturedRectangle(
 				new RectLocation(-0.95f,  0.78f, -0.45f, 0.92f),
-				new RectUv(0.5f, 0.125f, 1.0f, 0.25f));
+				new RectUv(4*UvSnackSize, UvSnackSize, 8*UvSnackSize, 2*UvSnackSize));
 			scoreText.texture = mainAtlas;
 			Instantiate(scoreText);
 
 			scoreObject = new TextObject(
-				new RectLocation(-0.4f,  0.8f, -0.3f, 0.9f), "0123456789");
+				new RectLocation(-2*XySnackSize,  4*XySnackSize, -2*XySnackSize + 0.1f, 0.9f), "0123456789");
 			Instantiate(scoreObject);
 
 			timeObject = new TextObject(
@@ -53,14 +65,14 @@ namespace Game
 			VBO vbo = new VBO(BufferTarget.ArrayBuffer, BufferUsageHint.StaticDraw);
 			snackBackGround = new TexturedRectangle(vbo, null, null);
 
-			TexturedRectangle.Vertex[] data = new TexturedRectangle.Vertex[6 * 10 * 10];
+			var data = new TexturedRectangle.Vertex[VertexPerSnack * BgQuadSize * BgQuadSize];
 
-			for (int y = 0; y < 10; y++)
+			for (int y = 0; y < BgQuadSize; y++)
 			{
-				for (int x = 0; x < 10; x++)
+				for (int x = 0; x < BgQuadSize; x++)
 				{
-					float startX = x * 0.2f - 1, startY = y * 0.2f - 1;
-					float endX = startX + 0.2f, endY = startY + 0.2f;
+					float startX = x * XySnackSize - 1f, startY = y * XySnackSize - 1f;
+					float endX = startX + XySnackSize, endY = startY + XySnackSize;
 
 					TexturedRectangle segment = new TexturedRectangle(
 						vbo,
@@ -69,7 +81,8 @@ namespace Game
 
 					TexturedRectangle.Vertex[] dataPerSnack = segment.GetGpuDataAsSixPoints();
 
-					for (int srcIndex = 0, dstIndex = (10*y + x)*6; srcIndex < 6; srcIndex++, dstIndex++)
+					for (int srcIndex = 0, dstIndex = (BgQuadSize*y + x)*VertexPerSnack;
+						srcIndex < VertexPerSnack; srcIndex++, dstIndex++)
 					{
 						data[dstIndex] = dataPerSnack[srcIndex];
 					}
@@ -78,7 +91,7 @@ namespace Game
 
 			vbo.SetData(data);
 
-			VAO vao = new VAO(6 * 10 * 10);
+			VAO vao = new VAO(VertexPerSnack * BgQuadSize * BgQuadSize);
 			vao.AttachVBO(0, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 0);
 			vao.AttachVBO(1, vbo, 2, VertexAttribPointerType.Float, 4 * sizeof(float), 2 * sizeof(float));
 			vao.PrimitiveType = PrimitiveType.Triangles;
@@ -91,8 +104,8 @@ namespace Game
 		}
 		// TODO remove
 		private int seconds;
-
 		private Random random = new Random();
+		// end remove
 
 		public override void Update()
 		{
@@ -100,17 +113,15 @@ namespace Game
 
 			if (seconds % 200 == 0)
 			{
-				int expCount = random.Next(3);
-				expCount = 0; // TODO
+				int expCount = random.Next(10);
+				//expCount = 0;
 				for (int i = 0; i < expCount; i++)
 				{
-					int x = random.Next(8), y = random.Next(8);
+					/*int x = random.Next(8), y = random.Next(8);
 					explosionsGroup.CreateExplosionIn(x, y);
-					snackMap.DeleteSnack(x, y);
+					snackMap.DeleteSnack(x, y);*/
 				}
-				snackMap.DeleteSnack(0, 0);
-				snackMap.DeleteSnack(0, 4);
-				snackMap.DeleteSnacks();
+				//snackMap.DeleteSnacks();
 			}
 
 			if (endTime > DateTime.Now)

@@ -23,6 +23,18 @@ namespace Scene
 			NewMap();
 		}
 
+		public void CheckSequence()
+		{
+			for (int y = 0; y < size_by_y; y++)
+			{
+				int adjacentCount = 0;
+				for (int x = 0; x < size_by_x; x++)
+				{
+
+				}
+			}
+		}
+
 		public void ResetMap()
 		{
 			for (int x = 0; x < size_by_y; x++)

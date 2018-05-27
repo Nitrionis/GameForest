@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net;
-using Graphics;
+﻿using Graphics;
 
 namespace Scene
 {
@@ -31,7 +29,7 @@ namespace Scene
 			drawCallCount++;
 			if (drawCallCount % 300 == 0)
 			{
-				System.Console.WriteLine("drawCallCount: " + drawCallCount / 300);
+				//System.Console.WriteLine("drawCallCount: " + drawCallCount / 300);
 
 				/*DeleteSnack(0, 0);
 				DeleteSnack(0, 1);
@@ -108,6 +106,79 @@ namespace Scene
 					//System.Console.WriteLine("NewPos: " + map[x][y]);
 				}
 			}
+		}
+
+		public void CheckSequence()
+		{
+			bool removeSnacks = false;
+			for (int y = 0; y < sizeY; y++)
+			{
+				int adjacentCount = 1;
+				Snack prevSnack = GetSnack(0, y);
+				for (int x = 1; x < sizeX; x++)
+				{
+					if (adjacentCount == 0)
+					{
+						prevSnack = GetSnack(x, y);
+						adjacentCount = 1;
+						continue;
+					}
+					Snack currSnack = GetSnack(x, y);
+					if (currSnack.snackId == prevSnack.snackId)
+					{
+						adjacentCount++;
+						prevSnack = currSnack;
+					}
+					else
+					{
+						if (adjacentCount >= 3)
+						{
+							removeSnacks = true;
+							for (int end = x - adjacentCount, i = x - 1; i >= end; i--)
+							{
+								DeleteSnack(i, y);
+							}
+						}
+						adjacentCount = 0;
+					}
+				}
+			}
+
+			for (int x = 0; x < sizeX; x++)
+			{
+				int adjacentCount = 1;
+				Snack prevSnack = GetSnack(x, 0);
+				for (int y = 1; y < sizeY; y++)
+				{
+					if (adjacentCount == 0)
+					{
+						prevSnack = GetSnack(x, y);
+						adjacentCount = 1;
+						continue;
+					}
+					Snack currSnack = GetSnack(x, y);
+					if (currSnack.snackId == prevSnack.snackId)
+					{
+						adjacentCount++;
+						prevSnack = currSnack;
+					}
+					else
+					{
+						if (adjacentCount >= 3)
+						{
+							removeSnacks = true;
+							for (int end = x - adjacentCount, i = x - 1; i >= end; i--)
+							{
+								DeleteSnack(i, y);
+							}
+						}
+						adjacentCount = 0;
+					}
+				}
+			}
+
+			if (removeSnacks)
+				DeleteSnacks();
 		}
 	}
 }

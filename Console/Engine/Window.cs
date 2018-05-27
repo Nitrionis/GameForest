@@ -33,6 +33,12 @@ namespace Game
 			Run(60 /*FPS*/);
 		}
 
+		protected void OnTimerTick(object source, ElapsedEventArgs e)
+		{
+			if (!sceneChanging)
+				scene.FixedUpdate();
+		}
+
 		protected override void OnLoad(EventArgs e)
 		{
 			GL.ClearColor(new Color4(34, 34, 34, 255));
@@ -50,10 +56,10 @@ namespace Game
 			GL.Viewport(0, 0, Width, Height);
 		}
 
-		protected void OnTimerTick(object source, ElapsedEventArgs e)
+		protected override void OnMouseDown(MouseButtonEventArgs e)
 		{
-			if (!sceneChanging)
-				scene.FixedUpdate();
+			scene.MbdDawn();
+			//System.Console.WriteLine("OnMouseDown");
 		}
 
 		protected override void OnRenderFrame(FrameEventArgs e)

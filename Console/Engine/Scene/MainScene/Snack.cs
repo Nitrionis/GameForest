@@ -9,6 +9,7 @@ namespace Scene
 		public int height;
 		public bool deleteFlag;
 		public long animationTime;
+		public int snackId;
 
 		public Stopwatch sw;
 

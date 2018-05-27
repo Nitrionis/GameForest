@@ -31,5 +31,17 @@ namespace Game
 			foreach (var obj in objects)
 				obj.OnApplicationClosing();
 		}
+
+		public virtual void MbdDawn()
+		{
+			foreach (var obj in objects)
+				obj.MbdDawn();
+		}
+
+		public virtual void MbdUp()
+		{
+			foreach (var obj in objects)
+				obj.MbdUp();
+		}
 	}
 }
