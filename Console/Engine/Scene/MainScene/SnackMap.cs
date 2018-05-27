@@ -108,17 +108,10 @@ namespace Scene
 				prevSnack = GetSnack(0, y);
 				for (int x = 1; x < sizeX; x++)
 				{
-					if (adjacentCount == 0)
-					{
-						prevSnack = GetSnack(x, y);
-						adjacentCount = 1;
-						continue;
-					}
 					Snack currSnack = GetSnack(x, y);
 					if (currSnack.snackId == prevSnack.snackId)
 					{
 						adjacentCount++;
-						prevSnack = currSnack;
 					}
 					else
 					{
@@ -130,8 +123,9 @@ namespace Scene
 								DeleteSnack(i, y);
 							}
 						}
-						adjacentCount = 0;
+						adjacentCount = 1;
 					}
+					prevSnack = currSnack;
 				}
 				if (adjacentCount >= 3)
 				{
@@ -150,17 +144,10 @@ namespace Scene
 				prevSnack = GetSnack(x, 0);
 				for (int y = 1; y < sizeY; y++)
 				{
-					if (adjacentCount == 0)
-					{
-						prevSnack = GetSnack(x, y);
-						adjacentCount = 1;
-						continue;
-					}
 					Snack currSnack = GetSnack(x, y);
 					if (currSnack.snackId == prevSnack.snackId)
 					{
 						adjacentCount++;
-						prevSnack = currSnack;
 					}
 					else
 					{
@@ -172,8 +159,9 @@ namespace Scene
 								DeleteSnack(x, i);
 							}
 						}
-						adjacentCount = 0;
+						adjacentCount = 1;
 					}
+					prevSnack = currSnack;
 				}
 				if (adjacentCount >= 3)
 				{
