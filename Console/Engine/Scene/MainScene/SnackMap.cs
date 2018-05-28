@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Graphics;
 
 namespace Scene
@@ -12,6 +13,8 @@ namespace Scene
 		private ExplosionsGroup explosionsGroup;
 
 		private Random random = new Random();
+
+		public Stopwatch sw { get; private set; }
 
 		public SnackMap(Game.Scene scene,ExplosionsGroup explosionsGroup, Texture texture, int sizeX, int sizeY)
 			: base(scene, texture, sizeX, sizeY)
@@ -27,11 +30,23 @@ namespace Scene
 				for (int y = 0; y < sizeX; y++, snackIndex++)
 					map[x][y] = snackIndex;
 			}
+
+			sw = new Stopwatch();
 		}
 
-		public override void Draw()
+		public override void Update()
 		{
-			base.Draw();
+			if (sw.IsRunning && sw.ElapsedMilliseconds > 3000)
+			{
+				if (CheckSequence())
+				{
+					sw.Restart();
+				}
+				else
+				{
+					sw.Stop();
+				}
+			}
 		}
 
 		public Snack GetSnack(int x, int y)
@@ -130,8 +145,7 @@ namespace Scene
 				if (adjacentCount >= 3)
 				{
 					removeSnacks = true;
-					for (int end = sizeX - adjacentCount, i = sizeX - 1;
-						i >= end; i--)
+					for (int end = sizeX - adjacentCount, i = sizeX - 1; i >= end; i--)
 					{
 						DeleteSnack(i, y);
 					}
@@ -166,8 +180,7 @@ namespace Scene
 				if (adjacentCount >= 3)
 				{
 					removeSnacks = true;
-					for (int end = sizeY - adjacentCount, i = sizeY - 1;
-						i >= end; i--)
+					for (int end = sizeY - adjacentCount, i = sizeY - 1; i >= end; i--)
 					{
 						DeleteSnack(x, i);
 					}
@@ -175,9 +188,29 @@ namespace Scene
 			}
 
 			if (removeSnacks)
+			{
+				System.Console.WriteLine("Remove snacks start");
+				PrintMap();
+				System.Console.WriteLine("Remove snacks del");
 				DeleteSnacks();
+				PrintMap();
+				System.Console.WriteLine("Remove snacks end");
+			}
 
 			return removeSnacks;
+		}
+
+		public void PrintMap()
+		{
+			for (int y = sizeY - 1; y >= 0; y--)
+			{
+				for (int x = 0; x < sizeX; x++)
+				{
+					Snack snack = GetSnack(x, y);
+					System.Console.Write(snack.snackId + " ");
+				}
+				System.Console.WriteLine();
+			}
 		}
 	}
 }

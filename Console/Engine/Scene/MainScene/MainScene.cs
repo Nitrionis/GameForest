@@ -37,7 +37,7 @@ namespace Game
 			explosionsGroup = new ExplosionsGroup(this, mainAtlas, XyMapQuadSize, XyMapQuadSize);
 			snackMap = new SnackMap(this, explosionsGroup, mainAtlas, XyMapQuadSize, XyMapQuadSize);
 
-			movableQuads = new MovableQuads(this, snackMap, explosionsGroup, mainAtlas);
+			movableQuads = new MovableQuads(this, snackMap, mainAtlas);
 			Instantiate(movableQuads);
 
 			Instantiate(snackMap);

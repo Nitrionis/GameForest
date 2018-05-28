@@ -14,7 +14,7 @@
 		public virtual void FixedApdate(){}
 		public virtual void OnApplicationClosing(){}
 
-		public virtual void MbdDawn(){}
+		public virtual void MbdDown(){}
 		public virtual void MbdUp(){}
 	}
 }

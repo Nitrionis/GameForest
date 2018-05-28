@@ -16,7 +16,6 @@ namespace Scene
 		private const float XyQuadSize = 0.2f;
 
 		private SnackMap snackMap;
-		private ExplosionsGroup explosionsGroup;
 
 		private TexturedRectangle rectangleOne;
 		private TexturedRectangle rectangleTwo;
@@ -26,10 +25,9 @@ namespace Scene
 		public int secondX { get; private set; }
 		public int secondY { get; private set; }
 
-		public MovableQuads(Game.Scene scene, SnackMap snackMap, ExplosionsGroup explosionsGroup, Texture texture)
+		public MovableQuads(Game.Scene scene, SnackMap snackMap, Texture texture)
 		{
 			this.snackMap = snackMap;
-			this.explosionsGroup = explosionsGroup;
 
 			rectangleOne = new TexturedRectangle(
 				new RectLocation(-1.0f, -1.0f, -1.0f, -1.0f),
@@ -93,7 +91,7 @@ namespace Scene
 			}
 		}
 
-		public override void MbdDawn()
+		public override void MbdDown()
 		{
 			Point newPos = GlobalReference.cursorPos;
 			newPos.X /= (GlobalReference.window.Width / 10);
@@ -122,6 +120,9 @@ namespace Scene
 							var snackOne = snackMap.GetSnack(newPos.X, newPos.Y);
 							var snackTwo = snackMap.GetSnack(firstX, firstY);
 
+							System.Console.WriteLine("Remove snacks prev start");
+							snackMap.PrintMap();
+
 							int value = snackOne.snackId;
 							snackOne.snackId = snackTwo.snackId;
 							snackTwo.snackId = value;
@@ -135,7 +136,8 @@ namespace Scene
 								SetFirstQuadPos(-1, -1);
 								SetSecondQuadPos(-1, -1);
 
-								while (snackMap.CheckSequence());
+								//while (snackMap.CheckSequence());
+								snackMap.sw.Start();
 							}
 							else
 							{

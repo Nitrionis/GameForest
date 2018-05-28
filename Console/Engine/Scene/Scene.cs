@@ -35,7 +35,7 @@ namespace Game
 		public virtual void MbdDawn()
 		{
 			foreach (var obj in objects)
-				obj.MbdDawn();
+				obj.MbdDown();
 		}
 
 		public virtual void MbdUp()

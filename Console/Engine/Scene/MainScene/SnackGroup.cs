@@ -60,7 +60,7 @@ namespace Scene
 
 			public void Event(int state)
 			{
-				System.Console.WriteLine(snack.height);
+				//System.Console.WriteLine(snack.height);
 				snack.offsetU = UvSnackSize * state;
 
 				return;
