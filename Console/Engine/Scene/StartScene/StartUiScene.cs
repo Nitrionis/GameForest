@@ -45,18 +45,5 @@ namespace Game
 			button.listeners.Add(buttonCheker);
 			Instantiate(button);
 		}
-
-		public override void Update()
-		{
-			base.Update();
-			CheckEvents();
-		}
-
-		private void CheckEvents()
-		{
-			MouseState mouseState = Mouse.GetState();
-			bool leftMouseDown = mouseState.IsButtonDown(MouseButton.Left);
-			bool rightMouseDown = mouseState.IsButtonDown(MouseButton.Right);
-		}
 	}
 }

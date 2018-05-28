@@ -135,7 +135,7 @@ namespace Scene
 								SetFirstQuadPos(-1, -1);
 								SetSecondQuadPos(-1, -1);
 
-								//while (snackMap.CheckSequence());
+								while (snackMap.CheckSequence());
 							}
 							else
 							{

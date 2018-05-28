@@ -100,7 +100,7 @@ namespace Scene
 					layout(location = 0) in vec2 in_Position;
 					layout(location = 1) in vec2 in_UV;
 
-					layout(location = 0) out vec2 out_UV;
+					out vec2 uv;
 
 					void main() {
 						uint value = exp_id[gl_VertexID / 6];
@@ -108,7 +108,7 @@ namespace Scene
 								(value & 0xff) * 0.125f,
 								(value >> 16) * 0.125f);
     					gl_Position = vec4(in_Position, 0.0, 1.0);
-						out_UV = in_UV + uvOffset;
+						uv = in_UV + uvOffset;
 					}
 					");
 				fragmentShader.Compile(@"
@@ -116,12 +116,12 @@ namespace Scene
 
 					uniform sampler2D tex;
 
-					layout(location = 0) in vec2 in_UV;
+					in vec2 uv;
 
 					layout(location = 0) out vec4 out_Color;
 
 					void main() {
-    					out_Color = texture(tex, in_UV);
+    					out_Color = texture(tex, uv);
 					}
 					");
 				shaderProgram.AttachShader(vertexShader);
