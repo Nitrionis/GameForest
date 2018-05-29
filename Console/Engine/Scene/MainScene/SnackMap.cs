@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Game;
 using Graphics;
 
 namespace Scene
@@ -16,8 +17,8 @@ namespace Scene
 
 		public Stopwatch sw { get; private set; }
 
-		public SnackMap(Game.Scene scene,ExplosionsGroup explosionsGroup, Texture texture, int sizeX, int sizeY)
-			: base(scene, texture, sizeX, sizeY)
+		public SnackMap(ExplosionsGroup explosionsGroup, Texture texture, int sizeX, int sizeY)
+			: base(texture, sizeX, sizeY)
 		{
 			this.explosionsGroup = explosionsGroup;
 
@@ -36,7 +37,7 @@ namespace Scene
 
 		public override void Update()
 		{
-			if (sw.IsRunning && sw.ElapsedMilliseconds > 3000)
+			if (sw.IsRunning && sw.ElapsedMilliseconds > 2000)
 			{
 				if (CheckSequence())
 				{
@@ -74,6 +75,8 @@ namespace Scene
 						explosionsGroup.CreateExplosionIn(x, y);
 						snack.snackId = random.Next(5);
 						snack.UpdateUvOffsetUsingId();
+
+						GlobalReference.score += 100;
 					}
 					else
 					{

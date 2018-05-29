@@ -7,8 +7,6 @@ namespace Scene
 {
 	public class SnackGroup : GameObject
 	{
-		protected Game.Scene scene;
-
 		private int uniformTimeHandler;
 		private int uniformOffsetsHandler;
 
@@ -18,8 +16,6 @@ namespace Scene
 		private ShaderProgram shaderProgram;
 
 		protected Snack[] snacks;
-
-		private Button[,] snacksButtons;
 
 		protected MapGenerator mapGenerator { get; private set; }
 
@@ -33,58 +29,18 @@ namespace Scene
 		protected const float XySnackSize = 0.2f;
 		protected const int VertexPerSnack = 6;
 
-		public SnackGroup(Game.Scene scene, Texture texture, int sizeX, int sizeY)
+		public SnackGroup(Texture texture, int sizeX, int sizeY)
 		{
-			this.scene = scene;
 			this.texture = texture;
 			this.sizeX = sizeX;
 			this.sizeY = sizeY;
 
 			snacks = new Snack[sizeX * sizeY];
 
-			snacksButtons = new Button[sizeX, sizeY];
 			moveOffsets = new float[sizeX * sizeY];
 
 			CreateShaderProgram();
 			CreateMesh();
-		}
-
-		class ButtonCheker : IButtonAction
-		{
-			private Snack snack;
-
-			public ButtonCheker(Snack snack)
-			{
-				this.snack = snack;
-			}
-
-			public void Event(int state)
-			{
-				//System.Console.WriteLine(snack.height);
-				snack.offsetU = UvSnackSize * state;
-
-				return;
-
-				snack.vbo.SetSubData(new []
-				{
-					/* Когда обновляем данные снэков, необходимо пересчитывать
-					 * позиции по Y, так как они не связаны с данными на видеокарте,
-					 * а используются для определения кликов по снэкам
-					 */
-					new TexturedRectangle.Vertex(snack.pos.startX, -1.0f,
-						snack.uv.startU + snack.offsetU, snack.uv.endV),
-					new TexturedRectangle.Vertex(snack.pos.startX, -1.0f + XySnackSize,
-						snack.uv.startU + snack.offsetU, snack.uv.startV),
-					new TexturedRectangle.Vertex(snack.pos.endX,   -1.0f + XySnackSize,
-						snack.uv.endU   + snack.offsetU, snack.uv.startV),
-					new TexturedRectangle.Vertex(snack.pos.startX, -1.0f,
-						snack.uv.startU + snack.offsetU, snack.uv.endV),
-					new TexturedRectangle.Vertex(snack.pos.endX,   -1.0f + XySnackSize,
-						snack.uv.endU   + snack.offsetU, snack.uv.startV),
-					new TexturedRectangle.Vertex(snack.pos.endX,   -1.0f,
-						snack.uv.endU   + snack.offsetU, snack.uv.endV)
-				}, 6, snack.vboDataOffset);
-			}
 		}
 
 		public void CreateMesh()
@@ -124,12 +80,6 @@ namespace Scene
 
 					snacks[snackIndex].pos.startY = startY;
 					snacks[snackIndex].pos.endY = endY;
-
-					snacksButtons[x,y] = new Button(snacks[snackIndex]);
-
-					ButtonCheker buttonCheker = new ButtonCheker(snacks[snackIndex]);
-					snacksButtons[x,y].listeners.Add(buttonCheker);
-					scene.Instantiate(snacksButtons[x,y]);
 
 					moveOffsets[x * sizeY + y] = y * XySnackSize;
 				}

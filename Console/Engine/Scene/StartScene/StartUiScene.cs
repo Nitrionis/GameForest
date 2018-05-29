@@ -1,8 +1,5 @@
-﻿using System.IO;
-using Game;
-using Scene;
+﻿using Scene;
 using Graphics;
-using OpenTK.Input;
 using static Game.GlobalReference;
 
 namespace Game

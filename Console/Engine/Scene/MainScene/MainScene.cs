@@ -30,12 +30,14 @@ namespace Game
 
 		public MainScene()
 		{
+			GlobalReference.score = 0;
+
 			Texture mainAtlas = new Texture(".\\resources\\MainScene\\atlas.png");
 
 			CreateBackGroung();
 
 			explosionsGroup = new ExplosionsGroup(this, mainAtlas, XyMapQuadSize, XyMapQuadSize);
-			snackMap = new SnackMap(this, explosionsGroup, mainAtlas, XyMapQuadSize, XyMapQuadSize);
+			snackMap = new SnackMap(explosionsGroup, mainAtlas, XyMapQuadSize, XyMapQuadSize);
 
 			movableQuads = new MovableQuads(this, snackMap, mainAtlas);
 			Instantiate(movableQuads);
@@ -103,8 +105,6 @@ namespace Game
 			Instantiate(snackBackGround);
 
 		}
-
-		private int score;
 		//private Random random = new Random();
 
 		public override void Update()
@@ -126,8 +126,11 @@ namespace Game
 			if (endTime > DateTime.Now)
 			{
 				timeObject.SetText((endTime - DateTime.Now).Seconds.ToString());
-				scoreObject.SetText(score.ToString());
-				score++;
+				scoreObject.SetText(GlobalReference.score.ToString());
+			}
+			else
+			{
+				GlobalReference.window.ChangeScene<EndUiScene>();
 			}
 		}
 

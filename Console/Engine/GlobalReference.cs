@@ -9,5 +9,6 @@ namespace Game
 		public static Scene scene;
 		public static Timer fixedUpdateTimer;
 		public static Point cursorPos;
+		public static int score;
 	}
 }
